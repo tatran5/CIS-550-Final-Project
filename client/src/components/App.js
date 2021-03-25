@@ -8,6 +8,7 @@ import Home from './Home'
 import NavBar from './NavBar'
 import RecipeCard from './RecipeCard'
 import ForDish from './ForDish'
+import ForLazyCooking from './ForLazyCooking'
 
 export default class App extends React.Component {
 
@@ -30,8 +31,8 @@ export default class App extends React.Component {
 							render={() => <ForDish />}
 						/>
 						<Route
-							path="/for-restrictions-and-needs"
-							render={() => <NavBar />}
+							path="/for-lazy-cooking"
+							render={() => <ForLazyCooking />}
 						/>
 						<Route
 							path="/for-restrictions-and-needs"

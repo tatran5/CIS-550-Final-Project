@@ -5,7 +5,7 @@ const ForRestrictionsNeeds = () => {
 	
 	return (
 		<div className='ForRestrictionsNeeds'>
-		
+		For Restrictions & Needs
 		</div>)
 }
 

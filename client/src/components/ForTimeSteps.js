@@ -8,7 +8,7 @@ const ForTimeSteps = () => {
 	
 	return (
 		<div className='ForTimeSteps'>
-			<div className='title'> Recipes for a dish</div>
+			For Time Steps
 		</div>
 	)
 }

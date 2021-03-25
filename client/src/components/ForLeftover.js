@@ -5,29 +5,31 @@ import { sortBy as sortByConsts, recipeCount as recipeCountConsts}  from './Cons
 
 const ForLeftover = () => {
 
-	const [dishName, setDishName] = useState('')
-	const [cookTime, setCookTime] = useState('')
+	const [ingredients, setIngredients] = useState('')
 	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
 	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
-
-	const findResults = () => {
-		// TODO: Fetch call to back end here
-		// PLACEHOLDER
+	const [find, setFind] = useState(false)
+	
+	const getResults = () => {
+		// TODO: fetch here
+		console.log('getting results')
+		return ['r1', 'r2', 'r3'].map((val, idx) => <div key={idx}>{val}</div>)
 	}
 
 	return (
 		<div className='ForLeftover'>
 			<div className='title'> Recipes for a dish</div>
 			<div className='inputs'>
-				<InputText className='dish-name' title={'Dish name'}
-					onInputChange={setDishName} placeholder='Enter the dishname here...'/>
-				<InputText className='cooking-time' title={'Cooking time at most'}
-					onInputChange={setCookTime} placeholder='Enter in minutes...'/>
+				<InputText className='ingredients' title={'Ingredients'}
+					onInputChange={setIngredients} placeholder='Separate ingredients by comma...'/>
 				<InputDropdown className='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options}/>
 				<InputDropdown className='sort-by' title={sortByConsts.title}
 					onSelectionChange={setSortBy} options={sortByConsts.options}/>
-				<div className='button' onClick={findResults()}>Find</div>
+				<div className='button' onClick={e => setFind(true)}>Find</div>
+			</div>
+			<div className='results-container'>
+				{ find ? getResults() : <></>}
 			</div>
 		</div>
 	)

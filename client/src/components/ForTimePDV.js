@@ -8,8 +8,7 @@ const ForTimePDV = () => {
 
 	return (
 		<div className='ForTimePDV'>
-			<div className='title'> Recipes for a dish</div>
-			
+			For time PDV
 		</div>
 	)
 }

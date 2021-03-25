@@ -9,7 +9,8 @@ const sortBy = {
 	cookingTime: 'Cooking time',
 	ingredientsCount: 'Number of ingredients',
 }
-sortBy.options = Object.keys(sortBy).map((key) => key)
+sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
+sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
 
 export  {
 	recipeCount,
