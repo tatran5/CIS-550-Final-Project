@@ -9,11 +9,22 @@ const ForLeftover = () => {
 	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
 	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
 	const [find, setFind] = useState(false)
-	
-	const getResults = () => {
+	const [results, setResults] = useState(<></>)
+
+	const submitQueries = () => {
+		console.log(ingredients)
+		// Process input ingredients from a string with commas
+		const separateIngredients = ingredients.split(',') // separate incredients by comma
+			.map(item => item.trim()) // get rid of white space
+			.filter(item => item !== '') // get rid of emptry string
+
+		console.log('separateIngredients')
+		console.log(separateIngredients)
+
 		// TODO: fetch here
 		console.log('getting results')
-		return ['r1', 'r2', 'r3'].map((val, idx) => <div key={idx}>{val}</div>)
+		// PLACEHOLDER
+		setResults(['r1', 'r2', 'r3'].map((val, idx) => <div key={idx}>{val}</div>))
 	}
 
 	return (
@@ -26,10 +37,10 @@ const ForLeftover = () => {
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options}/>
 				<InputDropdown className='sort-by' title={sortByConsts.title}
 					onSelectionChange={setSortBy} options={sortByConsts.options}/>
-				<div className='button' onClick={e => setFind(true)}>Find</div>
+				<div className='button' onClick={e => submitQueries()}>Find</div>
 			</div>
 			<div className='results-container'>
-				{ find ? getResults() : <></>}
+				{ results }
 			</div>
 		</div>
 	)
