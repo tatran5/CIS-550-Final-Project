@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import ForLeftover from './ForLeftover'
 import ForTimePDV from './ForTimePDV'
 import ForTimeSteps from './ForTimeSteps'
+import '../style/ForLazyCooking.css'
 
 const ForLazyCooking = () => {
 	const options = {
@@ -30,12 +31,13 @@ const ForLazyCooking = () => {
 
 	return (
 		<div className='ForLazyCooking'>
+			<div className='title'>Recipes for lazy cooking</div>
 			<div className='options'>
 				<div className='for leftover' onClick={e => setOption(options.LEFOVER)}>Use leftover ingredients</div>
 				<div className='for time-pdf' onClick={e => setOption(options.TIME_PDV)}>10 recipes for lowest cooking time & PDV</div>
 				<div className='for time-steps' onClick={e => setOption(options.TIME_STEPS)}>Lowest cooking time & least steps</div>
-				{ getOptionContent() }
 			</div>
+			{ getOptionContent() }
 		</div>
 	)
 }

@@ -10,7 +10,6 @@ const ForTimeSteps = () => {
 		results = results.map((item, idx) => <div key={idx}>{item}</div>)
 		return results
 	}
-
 	
 	const [results] = useState(fetchResults())
 

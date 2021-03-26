@@ -9,12 +9,14 @@ import NavBar from './NavBar'
 import RecipeCard from './RecipeCard'
 import ForDish from './ForDish'
 import ForLazyCooking from './ForLazyCooking'
+// import "@fontsource/scada" 
 
 export default class App extends React.Component {
 
 	render() {
 		return (
 			<div className="App">
+				<NavBar />
 				<Router>
 					<Switch>
 						<Route

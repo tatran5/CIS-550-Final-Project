@@ -1,13 +1,14 @@
 import React from 'react'
+import '../style/NavBar.css'
 
 const NavBar = () => {
 	return (
 		<div className='NavBar'>
-			<div className='button-home'>Home</div>
+			<a className='nav home' href="/">Home</a>
 			<div className='page-listing'>Find recipes:</div>
-			<div className='for a-dish'>for a dish</div>
-			<div className='for lazy-cooking'>for lazy cooking</div>
-			<div className='for restrictions-and-needs'>for restrictions & needs</div>
+			<a className='nav for' href="/for-a-dish">for a dish</a>
+			<a className='nav for' href="/for-lazy-cooking">for lazy cooking</a>
+			<div className='nav for'>for restrictions & needs</div>
 		</div>)
 }
 

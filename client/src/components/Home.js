@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
 import NavBar from './NavBar'
+import '../style/Home.css'
 
 const Home = () => {
 	
-
 	const getTopRecipes = () => {
 		// TODO. PLACEHOLDER HERE
 		const recipes = ['Salmon coconut soup', 'Chocolate buttermilk pie', 'Yuzu kosho deviled eggs']
@@ -23,15 +23,14 @@ const Home = () => {
 	
 	return (
 		<div className='Home'>
-			<NavBar />
 			<div className='title'>Find me recipes</div>
 			<div className='recipes'>
 				<div className='top-recipes container'> 
-					<div className='column header'>Top rated recipes</div>
+					<div className='column-header'>Top rated recipes</div>
 					{getTopRecipes()}
 				</div>
 				<div className='random-recipe container'> 
-					<div className='column header'>Our pick</div>
+					<div className='column-header'>Our pick</div>
 					{getRandomRecipe()}
 				</div>
 			</div>

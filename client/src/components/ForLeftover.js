@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import InputDropdown from './InputDropdown'
 import InputText from './InputText'
 import { sortBy as sortByConsts, recipeCount as recipeCountConsts}  from './Consts.js'
+import '../style/ForLeftover.css'
 
 const ForLeftover = () => {
 
@@ -30,13 +31,12 @@ const ForLeftover = () => {
 
 	return (
 		<div className='ForLeftover'>
-			<div className='title'> Recipes for a dish</div>
 			<div className='inputs'>
-				<InputText className='ingredients' title={'Ingredients'}
+				<InputText name='ingredients' title={'Ingredients'}
 					onInputChange={setIngredients} placeholder='Separate ingredients by comma...'/>
-				<InputDropdown className='recipe-count' title={recipeCountConsts.title}
+				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options}/>
-				<InputDropdown className='sort-by' title={sortByConsts.title}
+				<InputDropdown name='sort-by' title={sortByConsts.title}
 					onSelectionChange={setSortBy} options={sortByConsts.options}/>
 				<div className='button' onClick={e => submitQueries()}>Find</div>
 			</div>

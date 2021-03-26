@@ -1,0 +1,31 @@
+.Home {
+	width: 100%;
+	height: fit-content;
+}
+
+.Home > .title {
+	height: 70vh;
+	font-size: min(80px, 25vh);
+} 
+
+.recipes {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.column-header {
+	font-weight: bold;
+}
+
+.recipe:hover {
+	text-decoration: underline;
+}
