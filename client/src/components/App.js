@@ -9,7 +9,7 @@ import NavBar from './NavBar'
 import RecipeCard from './RecipeCard'
 import ForDish from './ForDish'
 import ForLazyCooking from './ForLazyCooking'
-// import "@fontsource/scada" 
+import ForRestrictionsNeeds from './ForRestrictionsNeeds'
 
 export default class App extends React.Component {
 
@@ -38,7 +38,7 @@ export default class App extends React.Component {
 						/>
 						<Route
 							path="/for-restrictions-and-needs"
-							render={() => <NavBar />}
+							render={() => <ForRestrictionsNeeds />}
 						/>
 						<Route
 							path="/navbar"

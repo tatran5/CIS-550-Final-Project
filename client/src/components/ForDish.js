@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import InputDropdown from './InputDropdown'
 import InputText from './InputText'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts}  from './Consts.js'
+import { sortBy as sortByConsts, recipeCount as recipeCountConsts, cookingTime}  from './Consts.js'
 import '../style/ForDish.css'
 
 const ForDish = () => {
@@ -21,7 +21,7 @@ const ForDish = () => {
 			<div className='inputs'>
 				<InputText name='dish-name' title={'Dish name'}
 					onInputChange={setDishName} placeholder='Enter the dish name here...'/>
-				<InputText name='cooking-time' title={'Cooking time at most'}
+				<InputText name='cooking-time' title={cookingTime.title}
 					onInputChange={setCookTime} placeholder='Enter in minutes...'/>
 				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options}/>

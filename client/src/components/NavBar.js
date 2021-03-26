@@ -8,7 +8,7 @@ const NavBar = () => {
 			<div className='page-listing'>Find recipes:</div>
 			<a className='nav for' href="/for-a-dish">for a dish</a>
 			<a className='nav for' href="/for-lazy-cooking">for lazy cooking</a>
-			<div className='nav for'>for restrictions & needs</div>
+			<a className='nav for' href="/for-restrictions-and-needs">for restrictions & needs</a>
 		</div>)
 }
 

@@ -1,6 +1,10 @@
 const recipeCount = {
-	title: 'Number of recipes',
+	title: 'No. of recipes',
 	options: [10, 20, 30]
+}
+
+const cookingTime = {
+	title: 'Cooking time',
 }
 
 const sortBy = {
@@ -12,7 +16,14 @@ const sortBy = {
 sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
 sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
 
+const separateInputString = (string) =>
+	string.split(',') // separate incredients by comma
+	.map(item => item.trim()) // get rid of white space
+	.filter(item => item !== '') // get rid of emptry string
+
 export  {
 	recipeCount,
-	sortBy
+	sortBy,
+	cookingTime,
+	separateInputString
 }

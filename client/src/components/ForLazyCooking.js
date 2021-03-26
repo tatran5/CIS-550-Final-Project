@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import ForLeftover from './ForLeftover'
 import ForTimePDV from './ForTimePDV'
 import ForTimeSteps from './ForTimeSteps'
-import '../style/ForLazyCooking.css'
 
 const ForLazyCooking = () => {
 	const options = {
