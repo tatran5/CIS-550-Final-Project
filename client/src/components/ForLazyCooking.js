@@ -32,7 +32,7 @@ const ForLazyCooking = () => {
 		<div className='ForLazyCooking'>
 			<div className='options'>
 				<div className='for leftover' onClick={e => setOption(options.LEFOVER)}>Use leftover ingredients</div>
-				<div className='for time-pdf' onClick={e => setOption(options.TIME_PDV)}>10 recipes for lowest cooking time & PDF</div>
+				<div className='for time-pdf' onClick={e => setOption(options.TIME_PDV)}>10 recipes for lowest cooking time & PDV</div>
 				<div className='for time-steps' onClick={e => setOption(options.TIME_STEPS)}>Lowest cooking time & least steps</div>
 				{ getOptionContent() }
 			</div>

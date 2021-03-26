@@ -22,7 +22,8 @@ const ForLeftover = () => {
 		console.log(separateIngredients)
 
 		// TODO: fetch here
-		console.log('getting results')
+		
+		
 		// PLACEHOLDER
 		setResults(['r1', 'r2', 'r3'].map((val, idx) => <div key={idx}>{val}</div>))
 	}
