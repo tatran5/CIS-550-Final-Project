@@ -35,6 +35,8 @@ app.get('/genres', routes.getGenres);
 /* ---- Q3b (Best Movies) ---- */
 app.get('/bestmovies/:decade/:genre', routes.bestMoviesPerDecadeGenre);
 
+// FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
+app.get('/recipe', routes.getRecipe)
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);
