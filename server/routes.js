@@ -165,10 +165,66 @@ const bestMoviesPerDecadeGenre = (req, res) => {
 };
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
-const getRecipe = (req, res) => {
+const getRecipes = (req, res) => {
 	console.log('Inside getRecipe')
 	const { name, timeMax, recipeCount, sortBy } = req.query
-	console.log(name)
+	console.log(recipeCount)
+	console.log(sortBy)
+
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
+	res.json(results)
+}
+
+const lowestTimePDV = (req, res) => {
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
+	res.json(results)
+}
+
+const lowestTimeSteps = (req, res) => {
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
+	res.json(results)
+}
+
+const restrictionAndNeeds = (req, res) => {
+	const { restriction, nutritions, timeMax, recipeCount, sortBy } = req.query
+	console.log(restriction)
+	console.log(nutritions) // array of strings
 	console.log(timeMax)
 	console.log(recipeCount)
 	console.log(sortBy)
@@ -183,22 +239,76 @@ const getRecipe = (req, res) => {
 	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
 	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
 	const results = [
-		{
-			name: 'ramen',
-			times: '10',
-			ingredientCount: 2,
-			rating: 5,
-			ratingCount: 20
-		},
-		{
-			name: 'fries',
-			times: '20',
-			ingredientCount: 1,
-			rating: 2,
-			ratingCount: 10
-		}
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
 	]
-	
+	res.json(results)
+}
+
+const withIngredients = (req, res) => {
+	const { ingredients, recipeCount, sortBy } = req.query
+	console.log(ingredients) // array of strings
+	console.log(recipeCount)
+	console.log(sortBy)
+
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
+	res.json(results)
+}
+
+const withNutritions = (req, res) => {
+	const { nutritions, timeMax, recipeCount, sortBy} = req.query
+	console.log(nutritions) // array of strings
+	console.log(timeMax)
+	console.log(recipeCount)
+	console.log(sortBy)
+
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
+	res.json(results)
+}
+
+const withoutIngredients = (req, res) => {
+	const { ingredients, timeMax, recipeCount, sortBy } = req.query
+	console.log(ingredients) // array of strings
+	console.log(recipeCount)
+	console.log(sortBy)
+
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	// connection.query(query, (err, rows, fields) => {
+	//   if (err) console.log(err);
+	//   else res.json(results);
+	// });
+
+	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
+	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	const results = [
+		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
+		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
+	]
 	res.json(results)
 }
 
@@ -209,5 +319,11 @@ module.exports = {
 	getDecades: getDecades,
 	getGenres: getGenres,
 	bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
-	getRecipe: getRecipe
+	getRecipes: getRecipes,
+	lowestTimePDV: lowestTimePDV,
+	lowestTimeSteps: lowestTimeSteps,
+	restrictionAndNeeds: restrictionAndNeeds,
+	withIngredients: withIngredients,
+	withNutritions: withNutritions,
+	withoutIngredients: withoutIngredients,
 };

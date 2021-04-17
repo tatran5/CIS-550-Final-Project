@@ -1,47 +1,69 @@
 import React, { useState } from 'react'
 import InputDropdown from './InputDropdown'
 import InputText from './InputText'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts}  from './Consts.js'
+import RecipeCard from './RecipeCard'
+import { sortBy as sortByConsts, recipeCount as recipeCountConsts, separateInputString } from './Consts.js'
 import '../style/ForLeftover.css'
 
 const ForLeftover = () => {
 
 	const [ingredients, setIngredients] = useState('')
-	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
-	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
-	const [find, setFind] = useState(false)
-	const [results, setResults] = useState(<></>)
+	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
+	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
+	const [recipes, setRecipes] = useState([])
 
-	const submitQueries = () => {
-		console.log(ingredients)
-		// Process input ingredients from a string with commas
-		const separateIngredients = ingredients.split(',') // separate incredients by comma
-			.map(item => item.trim()) // get rid of white space
-			.filter(item => item !== '') // get rid of emptry string
-
-		console.log('separateIngredients')
-		console.log(separateIngredients)
-
-		// TODO: fetch here
+	const fetchResults = () => {
+		const separatedIngredients = separateInputString(ingredients)
+		const params = new URLSearchParams()
 		
+		separatedIngredients.forEach(item => 
+			params.append('ingredients[]', item))
 		
-		// PLACEHOLDER
-		setResults(['r1', 'r2', 'r3'].map((val, idx) => <div key={idx}>{val}</div>))
+		params.append('recipeCount', recipeCount)
+		params.append('sortBy', sortBy)
+
+		fetch('/ingredients?' + params)
+			.then(res => {
+				const json = res.json()
+				return json
+			})
+			.then(data => {
+				setRecipes(data)
+			})
+			.catch(e => {
+				console.log(e)
+				return alert('Something went wrong while fetching result')
+			})
 	}
 
 	return (
 		<div className='ForLeftover'>
 			<div className='inputs'>
-				<InputText name='ingredients' title={'Ingredients'}
-					onInputChange={setIngredients} placeholder='Separate ingredients by comma...'/>
+				<InputText
+					name='ingredients'
+					title={'Ingredients'}
+					onInputChange={setIngredients}
+					placeholder='Separate ingredients by comma...' />
 				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
-					onSelectionChange={setRecipeCount} options={recipeCountConsts.options}/>
+					onSelectionChange={setRecipeCount} options={recipeCountConsts.options} />
 				<InputDropdown name='sort-by' title={sortByConsts.title}
-					onSelectionChange={setSortBy} options={sortByConsts.options}/>
-				<div className='button' onClick={e => submitQueries()}>Find</div>
+					onSelectionChange={setSortBy} options={sortByConsts.options} />
+				<div className='button' onClick={e => fetchResults()}>Find</div>
 			</div>
 			<div className='results-container'>
-				{ results }
+				{recipes.map((recipe, i) =>
+					<div key={`recipe-${i}`}>
+						<RecipeCard
+							name={recipe.name}
+							cookingTime={recipe.time}
+							ingredientCount={recipe.ingredientCount}
+							stepCount={recipe.stepCount}
+							rating={recipe.rating}
+							ratingCount={recipe.ratingCount}
+						/>
+						<br />
+					</div>
+				)}
 			</div>
 		</div>
 	)

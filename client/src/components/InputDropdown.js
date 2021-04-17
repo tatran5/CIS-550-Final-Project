@@ -8,7 +8,8 @@ const InputDropdown = ({ name, onSelectionChange, title, options }) => {
 			<div className='input-title'>{title}</div>
 			<div className='select'>
 				<select className='input dropdown' onChange={e => onSelectionChange(e.target.value)}>
-					{options.map((option, i) => <option className='dropdown-option' key={i}>{option}</option>)}
+					{options.map((option, i) => 
+						<option className='dropdown-option' key={`${name}-${i}`}>{option}</option>)}
 				</select>				
 			</div>		
 		</div>)

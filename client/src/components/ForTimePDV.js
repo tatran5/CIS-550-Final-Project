@@ -1,22 +1,45 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import InputDropdown from './InputDropdown'
 import InputText from './InputText'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts}  from './Consts.js'
+import RecipeCard from './RecipeCard'
+import { sortBy as sortByConsts, recipeCount as recipeCountConsts } from './Consts.js'
 
 const ForTimePDV = () => {
+	const [recipes, setRecipes] = useState([])
+
 	const fetchResults = () => {
-		// TODDO
-		let results = ['pdv1', 'pdv2', 'pdv3']
-		results = results.map((item, idx) => <div key={idx}>{item}</div>)
-		return results
+		fetch(`/lowest-time-pdv`, { method: 'GET' })
+			.then(res => {
+				const json = res.json()
+				return json
+			})
+			.then(data => {
+				setRecipes(data)
+			})
+			.catch(e => {
+				console.log(e)
+				return alert('Something went wrong while fetching result')
+			})
 	}
 
-	const [results] = useState(fetchResults())
+	useEffect(() => { fetchResults()}, [])
 
 	return (
 		<div className='ForTimePDV'>
 			<div className='results-container'>
-			{ results }
+				{recipes.map((recipe, i) =>
+					<div key={`recipe-${i}`}>
+						<RecipeCard
+							name={recipe.name}
+							cookingTime={recipe.time}
+							ingredientCount={recipe.ingredientCount}
+							stepCount={recipe.stepCount}
+							rating={recipe.rating}
+							ratingCount={recipe.ratingCount}
+						/>
+						<br />
+					</div>
+				)}
 			</div>
 		</div>
 	)

@@ -36,7 +36,13 @@ app.get('/genres', routes.getGenres);
 app.get('/bestmovies/:decade/:genre', routes.bestMoviesPerDecadeGenre);
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
-app.get('/recipe', routes.getRecipe)
+app.get('/ingredients', routes.withIngredients)
+app.get('/lowest-time-pdv', routes.lowestTimePDV)
+app.get('/lowest-time-steps', routes.lowestTimeSteps)
+app.get('/nutritions', routes.withNutritions)
+app.get('/recipe', routes.getRecipes)
+app.get('/restriction-and-needs', routes.restrictionAndNeeds)
+app.get('/without-ingredients', routes.withoutIngredients)
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);
