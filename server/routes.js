@@ -14,29 +14,31 @@ const getRecipes = (req, res) => {
 	const { name, timeMax, recipeCount, sortBy } = req.query
 	console.log(recipeCount)
 	console.log(sortBy)
-
+	/*
 	const query = `SELECT name, ratings
 	FROM recipe
 	ORDER BY ratings DESC
 	LIMIT 5;
 	`
 	console.log(query)
+	*/
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
+	/*
 	connection.query(query, (err, rows, fields) => {
 		if (err) console.log(err);
 		else res.json(rows);
 	});
-
+	*/
 	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
 	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	/*
+	
 	const results = [
 		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
 		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
 	]
 	res.json(results)
-	*/
+	
 }
 
 const getTopRecipes = (req, res) => {
@@ -131,6 +133,7 @@ const withIngredients = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
+	
 	const query = `WITH ingr_count AS
 	(
 		SELECT recipe_id, COUNT(*) AS num_ingredients
@@ -145,12 +148,13 @@ const withIngredients = (req, res) => {
 	AND r.minutes > 0
 	ORDER BY '${sortBy}'
 	LIMIT '${recipeCount}';`
-
+	
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
+		console.log(query);
 		if (err) console.log(err);
-		else res.json(results);
+		else res.json(rows);
 	});
 }
 
@@ -161,20 +165,24 @@ const withNutritions = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
+	
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
+	connection.query(query, (err, rows, fields) => {
+		console.log(query);
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 
 	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
 	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
+	/*
 	const results = [
 		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
 		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
 	]
 	res.json(results)
+	*/
 }
 
 const withoutIngredients = (req, res) => {
