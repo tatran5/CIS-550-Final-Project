@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 /* ---------------------------------------------------------------- */
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
+app.get('/common-ingredients', routes.commonIngredients)
 app.get('/ingredients', routes.withIngredients)
 app.get('/lowest-time-pdv', routes.lowestTimePDV)
 app.get('/lowest-time-steps', routes.lowestTimeSteps)

@@ -21,7 +21,7 @@ const separateInputString = (str) =>
 	.map(item => item.trim()) // get rid of white space
 	.filter(item => item !== '') // get rid of emptry string
 
-const formatRecipeName = (name) =>{
+const formatStr = (name) =>{
 	console.log(name)
 	return name.split(' ')
 		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -32,5 +32,5 @@ export  {
 	sortBy,
 	cookingTime,
 	separateInputString,
-	formatRecipeName
+	formatStr
 }

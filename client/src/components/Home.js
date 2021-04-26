@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import NavBar from './NavBar'
-import { formatRecipeName } from "./Consts"
+import { formatStr } from "./Consts"
 import '../style/Home.css'
 
 const Home = () => {
@@ -58,11 +58,11 @@ const Home = () => {
 				<div className='top-recipes container'> 
 					<div className='column-header'>Top rated recipes</div>
 						{ topRecipes.map((recipe, idx) => 
-							<div className='recipe' key={idx}>{formatRecipeName(recipe.name)}</div>) }
+							<div className='recipe' key={idx}>{formatStr(recipe.name)}</div>) }
 				</div>
 				<div className='random-recipe container'> 
 					<div className='column-header'>Our pick</div>
-					<div className='recipe'>{formatRecipeName(randomRecipe)}</div>
+					<div className='recipe'>{formatStr(randomRecipe)}</div>
 				</div>
 			</div>
 		</div>)

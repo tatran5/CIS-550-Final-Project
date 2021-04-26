@@ -9,6 +9,23 @@ const connection = mysql.createPool(config);
 /* -------------------------------------------------- */
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
+
+const commonIngredients = (req, res) => {
+	const query = `
+	SELECT i.name, COUNT(*) as count
+	FROM valid_recipes r
+	JOIN has_ingr hi ON r.id = hi.recipe_id
+	JOIN ingr i ON hi.ingr_id = i.id 
+	GROUP BY i.id 
+	ORDER BY count DESC
+	LIMIT 10;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
+}
+ 
 const getRecipes = (req, res) => {
 	const { name, timeMax, recipeCount, sortBy } = req.query
 	console.log(recipeCount)
@@ -209,6 +226,7 @@ const withoutIngredients = (req, res) => {
 }
 
 module.exports = {
+	commonIngredients: commonIngredients,
 	getRecipes: getRecipes,
 	getTopRecipes: getTopRecipes,
 	lowestTimePDV: lowestTimePDV,

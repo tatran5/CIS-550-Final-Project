@@ -1,5 +1,5 @@
 import React from 'react'
-import {formatRecipeName} from './Consts'
+import {formatStr} from './Consts'
 import '../style/RecipeCard.css'
 
 const RecipeCard = ({
@@ -14,7 +14,7 @@ const RecipeCard = ({
 	
 	return (
 		<div className='RecipeCard'>
-			<div className='name'> {formatRecipeName(name)} </div>
+			<div className='name'> {formatStr(name)} </div>
 			{ cookingTime? <div className='cooking-time'>Cooking time: {cookingTime} min</div> : <></> }
 			{ ingredientCount? 	<div className='ingredient-count'>Number of ingredients: {ingredientCount}</div> : <></> }
 			{ stepCount? <div className='step-count'>Number of steps: {stepCount}</div> : <></> }
