@@ -16,14 +16,20 @@ const sortBy = {
 sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
 sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
 
-const separateInputString = (string) =>
-	string.split(',') // separate incredients by comma
+const separateInputString = (str) =>
+	str.split(',') // separate incredients by comma
 	.map(item => item.trim()) // get rid of white space
 	.filter(item => item !== '') // get rid of emptry string
+
+const formatRecipeName = (name) =>
+	name.split(' ')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ')
 
 export  {
 	recipeCount,
 	sortBy,
 	cookingTime,
-	separateInputString
+	separateInputString,
+	formatRecipeName
 }

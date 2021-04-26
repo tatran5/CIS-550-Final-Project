@@ -1,19 +1,30 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBar from './NavBar'
+import { formatRecipeName } from "./Consts"
 import '../style/Home.css'
 
 const Home = () => {
-	
-	const getTopRecipes = () => {
-		// TODO. PLACEHOLDER HERE
-		const recipes = ['Salmon coconut soup', 'Chocolate buttermilk pie', 'Yuzu kosho deviled eggs']
+	const [topRecipes, setTopRecipes] = useState([])
 
-		return (
-			<> 
-				{ recipes.map((recipe, idx) => <div className='recipe' key={idx}>{recipe}</div>) }
-			</>
-		)
-	}
+	useEffect(() => {
+		const getTopRecipes = () => {
+			fetch('/top-recipes')
+				.then(res => {
+					const json = res.json()
+					return json
+				})
+				.then(data => {
+					console.log(data)
+					setTopRecipes(data)
+				})
+				.catch(e => {
+					console.log(e)
+					return alert('Something went wrong while fetching result')
+				})
+		}
+	
+		getTopRecipes();
+	}, [])
 
 	const getRandomRecipe = () => {
 		// TODO. PLACEHOLDER HERE
@@ -27,7 +38,8 @@ const Home = () => {
 			<div className='recipes'>
 				<div className='top-recipes container'> 
 					<div className='column-header'>Top rated recipes</div>
-					{getTopRecipes()}
+						{ topRecipes.map((recipe, idx) => 
+							<div className='recipe' key={idx}>{formatRecipeName(recipe.name)}</div>) }
 				</div>
 				<div className='random-recipe container'> 
 					<div className='column-header'>Our pick</div>
