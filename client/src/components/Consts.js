@@ -21,11 +21,12 @@ const separateInputString = (str) =>
 	.map(item => item.trim()) // get rid of white space
 	.filter(item => item !== '') // get rid of emptry string
 
-const formatRecipeName = (name) =>
-	name.split(' ')
+const formatRecipeName = (name) =>{
+	console.log(name)
+	return name.split(' ')
 		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ')
-
+}
 export  {
 	recipeCount,
 	sortBy,

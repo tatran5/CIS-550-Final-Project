@@ -5,10 +5,12 @@ import '../style/Home.css'
 
 const Home = () => {
 	const [topRecipes, setTopRecipes] = useState([])
+	const [randomRecipe, setRandomRecipe] = useState('')
 
 	useEffect(() => {
 		const getTopRecipes = () => {
 			const cachedTopRecipes = JSON.parse(window.localStorage.getItem('topRecipes'))
+
 			if (cachedTopRecipes) {
 				console.log(cachedTopRecipes)
 				console.log(typeof(cachedTopRecipes))
@@ -34,14 +36,22 @@ const Home = () => {
 				})
 		}
 	
-		getTopRecipes();
-	}, [])
+		const getRandomRecipe = () => {
+			fetch('/random-recipe')
+				.then(res => res.json())
+				.then(data => {
+					console.log(data)
+					setRandomRecipe(data[0].name)
+				})
+				.catch(e => {
+					console.log(e)
+					alert(`Something went wrong when getting random recipe for 'Our picks'`)
+				})
+		}
 
-	const getRandomRecipe = () => {
-		// TODO. PLACEHOLDER HERE
-		const recipe = 'Yemeni Chicken Matzo Ball Soup'
-		return (<div className='recipe'>{recipe}</div>)
-	}
+		getTopRecipes()
+		getRandomRecipe()
+	}, [])
 	
 	return (
 		<div className='Home'>
@@ -54,7 +64,7 @@ const Home = () => {
 				</div>
 				<div className='random-recipe container'> 
 					<div className='column-header'>Our pick</div>
-					{getRandomRecipe()}
+					<div className='recipe'>{formatRecipeName(randomRecipe)}</div>
 				</div>
 			</div>
 		</div>)

@@ -24,9 +24,9 @@ const getRecipes = (req, res) => {
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
-    if (err) console.log(err);
-    else res.json(rows);
-  });
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 
 	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
 	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
@@ -40,15 +40,17 @@ const getRecipes = (req, res) => {
 }
 
 const getTopRecipes = (req, res) => {
-	const query = `SELECT name, ratings
+	console.log('getTopRecipes called')
+	const query = `
+	SELECT name, ratings
 	FROM recipe
 	ORDER BY ratings DESC
 	LIMIT 5;
 	`
 	connection.query(query, (err, rows, fields) => {
-    if (err) console.log(err);
-    else res.json(rows);
-  });
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const lowestTimePDV = (req, res) => {
@@ -83,6 +85,20 @@ const lowestTimeSteps = (req, res) => {
 		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
 	]
 	res.json(results)
+}
+
+const randomRecipe = (req, res) => {
+	console.log('randomRecipe called')
+	const query = `
+	SELECT name
+	FROM recipe
+	ORDER BY RAND()
+	LIMIT 1;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const restrictionAndNeeds = (req, res) => {
@@ -188,6 +204,7 @@ module.exports = {
 	getTopRecipes: getTopRecipes,
 	lowestTimePDV: lowestTimePDV,
 	lowestTimeSteps: lowestTimeSteps,
+	randomRecipe: randomRecipe,
 	restrictionAndNeeds: restrictionAndNeeds,
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
