@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import NavBar from './NavBar'
-import { formatStr } from "./Consts"
+import NavBar from './helpers/NavBar'
+import { formatStr } from "./helpers/Consts"
 import '../style/Home.css'
 
 const Home = () => {

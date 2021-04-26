@@ -5,8 +5,7 @@ import {
 	Switch
 } from 'react-router-dom';
 import Home from './Home'
-import NavBar from './NavBar'
-import RecipeCard from './RecipeCard'
+import NavBar from './helpers/NavBar'
 import ForDish from './ForDish'
 import ForLazyCooking from './ForLazyCooking'
 import ForRestrictionsNeeds from './ForRestrictionsNeeds'
@@ -39,14 +38,6 @@ export default class App extends React.Component {
 						<Route
 							path="/for-restrictions-and-needs"
 							render={() => <ForRestrictionsNeeds />}
-						/>
-						<Route
-							path="/navbar"
-							render={() => <NavBar />}
-						/>
-						<Route
-							path="/recipe-card"
-							render={() => <RecipeCard />}
 						/>
 					</Switch>
 				</Router>

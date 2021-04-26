@@ -1,6 +1,6 @@
 import React from 'react'
 import {formatStr} from './Consts'
-import '../style/RecipeCard.css'
+import '../../style/RecipeCard.css'
 
 const RecipeCard = ({
 		name, 

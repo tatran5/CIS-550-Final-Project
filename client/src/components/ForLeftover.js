@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import InputDropdown from './InputDropdown'
-import InputText from './InputText'
-import RecipeCard from './RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, separateInputString } from './Consts.js'
+import InputDropdown from './helpers/InputDropdown'
+import InputText from './helpers/InputText'
+import RecipeCard from './helpers/RecipeCard'
+import { sortBy as sortByConsts, recipeCount as recipeCountConsts, separateInputString } from './helpers/Consts'
 import '../style/ForLeftover.css'
 
 const ForLeftover = () => {

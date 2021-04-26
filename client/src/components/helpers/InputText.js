@@ -1,5 +1,5 @@
 import React from 'react'
-import '../style/InputText.css'
+import '../../style/InputText.css'
 
 const InputText = ({ name, onInputChange, title, placeholder }) => {
 	return (

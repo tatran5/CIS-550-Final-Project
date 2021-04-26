@@ -1,5 +1,5 @@
 import React from 'react'
-import '../style/InputDropdown.css'
+import '../../style/InputDropdown.css'
 
 const InputDropdown = ({ name, onSelectionChange, title, options }) => {
 

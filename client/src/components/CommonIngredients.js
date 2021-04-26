@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {formatStr} from './Consts'
+import {formatStr} from './helpers/Consts'
 import '../style/CommonIngredients.css'
 
 const CommonIngredients = () => {
