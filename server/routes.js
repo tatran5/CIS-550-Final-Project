@@ -10,7 +10,6 @@ const connection = mysql.createPool(config);
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
 const getRecipes = (req, res) => {
-	console.log('Inside getRecipe')
 	const { name, timeMax, recipeCount, sortBy } = req.query
 	console.log(recipeCount)
 	console.log(sortBy)
@@ -42,7 +41,6 @@ const getRecipes = (req, res) => {
 }
 
 const getTopRecipes = (req, res) => {
-	console.log('getTopRecipes called')
 	const query = `
 	SELECT name, ratings
 	FROM recipe
@@ -56,20 +54,23 @@ const getTopRecipes = (req, res) => {
 }
 
 const lowestTimePDV = (req, res) => {
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	const query = `
+	WITH min_minutes AS 
+	(
+		SELECT name, minutes, total_fat, sugar, sodium, protein
+		FROM valid_recipes
+		ORDER BY minutes ASC
+		LIMIT 10
+	)
+	SELECT name, minutes, (total_fat + sugar + sodium + protein) AS totalPDV
+	FROM min_minutes
+	WHERE (total_fat + sugar + sodium + protein) > 0
+	ORDER BY totalPDV ASC;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const lowestTimeSteps = (req, res) => {

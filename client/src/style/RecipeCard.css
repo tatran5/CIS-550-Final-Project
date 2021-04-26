@@ -1,0 +1,23 @@
+.RecipeCard {
+	width: 200px;
+	height: 220px;
+	margin: 15px 15px 15px 15px;
+	background-color: white;
+	padding: 15px;
+	border-radius: 12px;
+}
+
+.RecipeCard > * {
+	text-align: center;
+	width: 100%;
+}
+
+.RecipeCard > .cooking-time{
+	text-align: center;
+	width: 100%;
+}
+
+.RecipeCard > .name {
+	font-weight: bold;
+	margin-bottom: 5px;
+}

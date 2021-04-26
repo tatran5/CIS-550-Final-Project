@@ -9,11 +9,9 @@ const Home = () => {
 
 	useEffect(() => {
 		const getTopRecipes = () => {
-			const cachedTopRecipes = JSON.parse(window.localStorage.getItem('topRecipes'))
+			const cachedTopRecipes = JSON.parse(localStorage.getItem('topRecipes'))
 
 			if (cachedTopRecipes) {
-				console.log(cachedTopRecipes)
-				console.log(typeof(cachedTopRecipes))
 				cachedTopRecipes.forEach(recipe => console.log(recipe))
 				setTopRecipes(cachedTopRecipes)
 			}
@@ -28,7 +26,7 @@ const Home = () => {
 					setTopRecipes(data)
 					 
 					// Cache this to local storage since the results are static
-					window.localStorage.setItem('topRecipes',  JSON.stringify(data))
+					localStorage.setItem('topRecipes',  JSON.stringify(data))
 				})
 				.catch(e => {
 					console.log(e)

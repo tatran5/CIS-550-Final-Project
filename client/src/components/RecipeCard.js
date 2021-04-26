@@ -1,21 +1,26 @@
 import React from 'react'
+import {formatRecipeName} from './Consts'
+import '../style/RecipeCard.css'
 
-const RecipeCard = ({name, cookingTime, ingredientCount, stepCount, rating, ratingCount}) => {
-	// TODO. PLACEHOLDER ONLY
-	// recipe = 'Easy Real Tonkotsu'
-	// cookingTime = 40
-	// stepCount = 4	
-	// rating = 4.8
-	// ratingCount = 1643	
+const RecipeCard = ({
+		name, 
+		cookingTime, 
+		ingredientCount,
+		rating, 
+		ratingCount, 
+		stepCount, 
+		totalPDV, 
+	}) => {
 	
 	return (
 		<div className='RecipeCard'>
-			<div className='name'> {name} </div>
-			<div className='cooking-time'>Cooking time: {cookingTime} min</div>
-			<div className='step-count'>Number of steps: {stepCount}</div>
-			<div className='ingredient-count'>Number of ingredients: {ingredientCount}</div>
-			<div className='rating'>Rating: {rating}/5</div>
-			<div className='rating-count'>Number of ratings: {ratingCount} min</div>
+			<div className='name'> {formatRecipeName(name)} </div>
+			{ cookingTime? <div className='cooking-time'>Cooking time: {cookingTime} min</div> : <></> }
+			{ ingredientCount? 	<div className='ingredient-count'>Number of ingredients: {ingredientCount}</div> : <></> }
+			{ stepCount? <div className='step-count'>Number of steps: {stepCount}</div> : <></> }
+			{ rating? <div className='rating'>Rating: {rating}/5</div> : <></> }
+			{ ratingCount? <div className='rating-count'>Number of ratings: {ratingCount} min</div> : <></>}
+			{ totalPDV? <div className='total-pdv'>Total PDV: {totalPDV}</div> : <></> }
 		</div>)
 }
 

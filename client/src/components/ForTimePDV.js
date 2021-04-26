@@ -7,22 +7,30 @@ import { sortBy as sortByConsts, recipeCount as recipeCountConsts } from './Cons
 const ForTimePDV = () => {
 	const [recipes, setRecipes] = useState([])
 
-	const fetchResults = () => {
-		fetch(`/lowest-time-pdv`, { method: 'GET' })
-			.then(res => {
-				const json = res.json()
-				return json
-			})
-			.then(data => {
-				setRecipes(data)
-			})
-			.catch(e => {
-				console.log(e)
-				return alert('Something went wrong while fetching result')
-			})
-	}
+	useEffect(() => {
+		const fetchResults = () => {
+			fetch(`/lowest-time-pdv`, { method: 'GET' })
+				.then(res => {
+					const json = res.json()
+					return json
+				})
+				.then(data => {
+					setRecipes(data)
+					localStorage.setItem('timePDV', JSON.stringify(data))
+				})
+				.catch(e => {
+					console.log(e)
+					return alert('Something went wrong while fetching result')
+				})
+		}
 
-	useEffect(() => { fetchResults()}, [])
+		const cachedTimePDV = JSON.parse(localStorage.getItem('timePDV'))
+		if (cachedTimePDV) {
+			setRecipes(cachedTimePDV)
+		} else {
+			fetchResults()
+		}
+	}, [])
 
 	return (
 		<div className='ForTimePDV'>
@@ -31,11 +39,8 @@ const ForTimePDV = () => {
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
-							stepCount={recipe.stepCount}
-							rating={recipe.rating}
-							ratingCount={recipe.ratingCount}
+							cookingTime={recipe.minutes}
+							totalPDV={recipe.totalPDV}
 						/>
 						<br />
 					</div>
