@@ -147,11 +147,8 @@ const restrictionAndNeeds = (req, res) => {
 
 const withFewIngredients = (req, res) => {
 	const { recipeCount, sortBy } = req.query
-	
-	console.log(sortBy)
-	console.log(recipeCount)
 
-	const query = `
+	let query = `
 	SELECT r.name, COUNT(*) AS count, r.ratings, r.minutes
 	FROM valid_recipes r 
 	JOIN has_ingr hi ON r.id = hi.recipe_id
@@ -160,6 +157,18 @@ const withFewIngredients = (req, res) => {
 	ORDER BY ${sortBy}
 	LIMIT ${recipeCount}
 	`
+
+	if (sortBy === 'ratings') {
+		query = `
+		SELECT r.name, COUNT(*) AS count, r.ratings, r.minutes
+		FROM valid_recipes r 
+		JOIN has_ingr hi ON r.id = hi.recipe_id
+		GROUP BY r.id 
+		HAVING count <= 5
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount}
+		`	
+	}
 	
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 

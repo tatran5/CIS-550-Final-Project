@@ -25,7 +25,6 @@ const FewIngredients = () => {
 		)
 			.then(res => res.json())
 			.then(data => {
-				console.log(data)
 				setRecipes(data)
 			})
 	}
