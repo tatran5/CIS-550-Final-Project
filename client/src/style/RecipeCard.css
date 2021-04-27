@@ -1,6 +1,7 @@
 .RecipeCard {
 	width: 200px;
-	height: 220px;
+	height: 150px;
+	min-height: fit-content;
 	margin: 15px 15px 15px 15px;
 	background-color: white;
 	padding: 15px;

@@ -3,6 +3,7 @@ import ForLeftover from './ForLeftover'
 import ForTimePDV from './ForTimePDV'
 import ForTimeSteps from './ForTimeSteps'
 import CommonIngredients from './CommonIngredients'
+import FewIngredients from './FewIngredients'
 
 const ForLazyCooking = () => {
 	const options = {
@@ -11,7 +12,7 @@ const ForLazyCooking = () => {
 		TIME_PDV: 2,
 		TIME_STEPS: 3,
 		COMMON_INGREDIENTS: 4,
-		AT_MOST_5_INGREDIENTS: 5,
+		FEW_INGREDIENTS: 5,
 	}
 
 	const [option, setOption] = useState(options.NONE)
@@ -30,6 +31,8 @@ const ForLazyCooking = () => {
 				return <ForTimeSteps />	
 			case options.COMMON_INGREDIENTS:
 				return <CommonIngredients />
+			case options.FEW_INGREDIENTS:
+				return <FewIngredients />
 		}
 	}
 
@@ -41,6 +44,7 @@ const ForLazyCooking = () => {
 				<div className='for time-pdf' onClick={e => setOption(options.TIME_PDV)}>10 recipes for lowest cooking time & PDV</div>
 				<div className='for time-steps' onClick={e => setOption(options.TIME_STEPS)}>Lowest cooking time & least steps</div>
 				<div className='for common-ingredients' onClick={e => setOption(options.COMMON_INGREDIENTS)}>10 most common ingredients</div>
+				<div className='for few-ingredients' onClick={e => setOption(options.FEW_INGREDIENTS)}>Use at most 5 ingredients</div>
 			</div>
 			{ getOptionContent() }
 		</div>

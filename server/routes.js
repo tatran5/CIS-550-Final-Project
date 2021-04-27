@@ -60,7 +60,7 @@ const getRecipes = (req, res) => {
 const getTopRecipes = (req, res) => {
 	const query = `
 	SELECT name, ratings
-	FROM recipe
+	FROM valid_recipes
 	ORDER BY ratings DESC
 	LIMIT 5;
 	`
@@ -111,7 +111,7 @@ const randomRecipe = (req, res) => {
 	console.log('randomRecipe called')
 	const query = `
 	SELECT name
-	FROM recipe
+	FROM valid_recipes
 	ORDER BY RAND()
 	LIMIT 1;
 	`
@@ -145,6 +145,31 @@ const restrictionAndNeeds = (req, res) => {
 	res.json(results)
 }
 
+const withFewIngredients = (req, res) => {
+	const { recipeCount, sortBy } = req.query
+	
+	console.log(sortBy)
+	console.log(recipeCount)
+
+	const query = `
+	SELECT r.name, COUNT(*) AS count, r.ratings, r.minutes
+	FROM valid_recipes r 
+	JOIN has_ingr hi ON r.id = hi.recipe_id
+	GROUP BY r.id 
+	HAVING count <= 5
+	ORDER BY ${sortBy}
+	LIMIT ${recipeCount}
+	`
+	
+	// TODO: write query and return 
+	// Follow the examples in hw2 to return 
+	connection.query(query, (err, rows, fields) => {
+		console.log(query);
+		if (err) console.log(err);
+		else res.json(rows);
+	});
+}
+
 const withIngredients = (req, res) => {
 	const { ingredients, recipeCount, sortBy } = req.query
 	console.log(ingredients) // array of strings
@@ -159,13 +184,13 @@ const withIngredients = (req, res) => {
 		GROUP BY recipe_id
 	)
 	SELECT r.name, r.ratings, r.minutes, ic.num_ingredients
-	FROM recipe r
+	FROM valid_recipes r
 	JOIN ingr_count ic ON r.id = ic.recipe_id
 	WHERE name LIKE '%${ingredients}%' 
 	AND r.name NOT REGEXP '[0-9] [0-9]' 
 	AND r.minutes > 0
-	ORDER BY '${sortBy}'
-	LIMIT '${recipeCount}';`
+	ORDER BY ${sortBy}
+	LIMIT ${recipeCount};`
 	
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
@@ -233,6 +258,7 @@ module.exports = {
 	lowestTimeSteps: lowestTimeSteps,
 	randomRecipe: randomRecipe,
 	restrictionAndNeeds: restrictionAndNeeds,
+	withFewIngredients: withFewIngredients,
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
 	withoutIngredients: withoutIngredients,

@@ -24,6 +24,7 @@ app.get('/recipe', routes.getRecipes)
 app.get('/restriction-and-needs', routes.restrictionAndNeeds)
 app.get('/top-recipes', routes.getTopRecipes)
 app.get('/without-ingredients', routes.withoutIngredients)
+app.get('/with-few-ingredients', routes.withFewIngredients)
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

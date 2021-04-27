@@ -11,14 +11,14 @@ const RecipeCard = ({
 		stepCount, 
 		totalPDV, 
 	}) => {
-	
+
 	return (
 		<div className='RecipeCard'>
 			<div className='name'> {formatStr(name)} </div>
 			{ cookingTime? <div className='cooking-time'>Cooking time: {cookingTime} min</div> : <></> }
 			{ ingredientCount? 	<div className='ingredient-count'>Number of ingredients: {ingredientCount}</div> : <></> }
 			{ stepCount? <div className='step-count'>Number of steps: {stepCount}</div> : <></> }
-			{ rating? <div className='rating'>Rating: {rating}/5</div> : <></> }
+			{ rating? <div className='rating'>Rating: {String(rating).substr(0, 3)}/5</div> : <></> }
 			{ ratingCount? <div className='rating-count'>Number of ratings: {ratingCount} min</div> : <></>}
 			{ totalPDV? <div className='total-pdv'>Total PDV: {totalPDV}</div> : <></> }
 		</div>)

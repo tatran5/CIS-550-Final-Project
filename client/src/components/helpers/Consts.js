@@ -16,6 +16,14 @@ const sortBy = {
 sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
 sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
 
+const matchCategoryWithDb = (str) => {
+	// for sort by
+	if (str === sortBy.title) return 'name'
+	if (str === sortBy.rating) return 'ratings'
+	if (str === sortBy.cookingTime) return 'minutes'
+	if (str === sortBy.ingredientsCount) return 'count'
+}
+
 const separateInputString = (str) =>
 	str.split(',') // separate incredients by comma
 	.map(item => item.trim()) // get rid of white space
@@ -30,6 +38,7 @@ const formatStr = (name) =>{
 export  {
 	recipeCount,
 	sortBy,
+	matchCategoryWithDb,
 	cookingTime,
 	separateInputString,
 	formatStr
