@@ -27,34 +27,38 @@ const commonIngredients = (req, res) => {
 }
  
 const getRecipes = (req, res) => {
-	const { name, timeMax, recipeCount, sortBy } = req.query
+	const { name, recipeCount, sortBy } = req.query
+	console.log('callinggggg')
+	console.log(req.query)
+	console.log(name)
 	console.log(recipeCount)
+	
 	console.log(sortBy)
-	/*
-	const query = `SELECT name, ratings
-	FROM recipe
-	ORDER BY ratings DESC
-	LIMIT 5;
+	let query = `
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE name LIKE '%${name}%' 
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
 	`
-	console.log(query)
-	*/
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	/*
+
+	
+	if (sortBy === 'ratings') {
+		query = `
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE name LIKE '%${name}%' 
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount};
+	`
+	}
+	
 	connection.query(query, (err, rows, fields) => {
 		if (err) console.log(err);
 		else res.json(rows);
 	});
-	*/
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
-	
 }
 
 const getTopRecipes = (req, res) => {
@@ -149,22 +153,22 @@ const withFewIngredients = (req, res) => {
 	const { recipeCount, sortBy } = req.query
 
 	let query = `
-	SELECT r.name, COUNT(*) AS count, r.ratings, r.minutes
+	SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
 	FROM valid_recipes r 
 	JOIN has_ingr hi ON r.id = hi.recipe_id
 	GROUP BY r.id 
-	HAVING count <= 5
+	HAVING ingredientCount <= 5
 	ORDER BY ${sortBy}
 	LIMIT ${recipeCount}
 	`
 
 	if (sortBy === 'ratings') {
 		query = `
-		SELECT r.name, COUNT(*) AS count, r.ratings, r.minutes
+		SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
 		FROM valid_recipes r 
 		JOIN has_ingr hi ON r.id = hi.recipe_id
 		GROUP BY r.id 
-		HAVING count <= 5
+		HAVING ingredientCount <= 5
 		ORDER BY ${sortBy} DESC
 		LIMIT ${recipeCount}
 		`	
@@ -173,7 +177,6 @@ const withFewIngredients = (req, res) => {
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
-		console.log(query);
 		if (err) console.log(err);
 		else res.json(rows);
 	});
@@ -186,13 +189,14 @@ const withIngredients = (req, res) => {
 	console.log(sortBy)
 
 	
-	const query = `WITH ingr_count AS
+	const query = `
+	WITH ingr_count AS
 	(
 		SELECT recipe_id, COUNT(*) AS num_ingredients
 		FROM has_ingr
 		GROUP BY recipe_id
 	)
-	SELECT r.name, r.ratings, r.minutes, ic.num_ingredients
+	SELECT r.name, r.ratings, r.minutes, ic.ingredientCount
 	FROM valid_recipes r
 	JOIN ingr_count ic ON r.id = ic.recipe_id
 	WHERE name LIKE '%${ingredients}%' 

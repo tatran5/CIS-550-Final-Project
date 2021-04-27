@@ -48,7 +48,7 @@ const FewIngredients = () => {
 				{recipes.map((recipe, idx) => <RecipeCard
 					key={`few-ingredients-${idx}`}
 					name={recipe.name}
-					ingredientCount={recipe.count}
+					ingredientCount={recipe.ingredientCount}
 					rating={recipe.ratings}
 					cookingTime={recipe.minutes}
 				/>)}

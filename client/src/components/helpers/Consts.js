@@ -30,7 +30,6 @@ const separateInputString = (str) =>
 	.filter(item => item !== '') // get rid of emptry string
 
 const formatStr = (name) =>{
-	console.log(name)
 	return name.split(' ')
 		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ')
