@@ -2,15 +2,18 @@ import React, { useState } from 'react'
 import InputDropdown from './helpers/InputDropdown'
 import InputText from './helpers/InputText'
 import RecipeCard from './helpers/RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, cookingTime, separateInputString } from './helpers/Consts'
+import { 
+	sortBy as sortByConsts, 
+	recipeCount as recipeCountConsts, 
+	matchCategoryWithDb,
+	separateInputString } from './helpers/Consts'
 import '../style/NutritionalNeeds.css'
 
 const NutritionalNeeds = () => {
 
 	const [nutritions, setNutritions] = useState('')
-	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
-	const [cookTime, setCookTime] = useState('')
-	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
+	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
+	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
 	const [recipes, setRecipes] = useState([])
 
 	const fetchResults = () => {
@@ -20,9 +23,10 @@ const NutritionalNeeds = () => {
 		separatedIngredients.forEach(item =>
 			params.append('nutritions[]', item))
 
-		params.append('timeMax', cookTime)
 		params.append('recipeCount', recipeCount)
-		params.append('sortBy', sortBy)
+		console.log(sortBy)
+		console.log(matchCategoryWithDb(sortBy))
+		params.append('sortBy', matchCategoryWithDb(sortBy))
 
 		fetch('/nutritions?' + params)
 			.then(res => {
@@ -43,9 +47,9 @@ const NutritionalNeeds = () => {
 			<div className='inputs'>
 				<InputText
 					name='nutritions'
-					title={'Nutritions to include'}
+					title={'Max amount of sugar, sodium, protein, saturated fat, and total fat to include'}
 					onInputChange={setNutritions}
-					placeholder='Ex: 20, 10, 40, 5 for max. amount of sugar, sodium, protein and saturated fat respectively...' />
+					placeholder='Ex: 20, 10, 40, 5, 10 for sugar, sodium, protein, saturated fat and total fat respectively...' />
 				<InputDropdown
 					name='recipe-count'
 					title={recipeCountConsts.title}
@@ -63,10 +67,10 @@ const NutritionalNeeds = () => {
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
+							cookingTime={recipe.minutes}
+							ingredientCount={recipe.ingredientsCount}
 							stepCount={recipe.stepCount}
-							rating={recipe.rating}
+							rating={recipe.ratings}
 							ratingCount={recipe.ratingCount}
 						/>
 						<br />

@@ -240,17 +240,45 @@ const withIngredients = (req, res) => {
 }
 
 const withNutritions = (req, res) => {
-	const { nutritions, timeMax, recipeCount, sortBy } = req.query
+	const { nutritions, recipeCount, sortBy } = req.query
 	console.log(nutritions) // array of strings
-	console.log(timeMax)
 	console.log(recipeCount)
 	console.log(sortBy)
+	const maxSugar = nutritions[0]
+	const maxSodium = nutritions[1]
+	const maxProtein = nutritions[2]
+	const maxSaturatedFat = nutritions[3]
+	const maxTotalFat = nutritions[4]
 
+	let query = `	
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.total_fat <= '${maxTotalFat}' AND
+					r.sugar <= '${maxSugar}' AND
+							r.sodium <= '${maxSodium}' AND
+							r.protein <= '${maxProtein}' AND
+							r.saturated_fat <= '${maxSaturatedFat}'
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+	`
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
+	if (sortBy === 'ratings') {
+		query = `	
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.total_fat <= '${maxTotalFat}' AND
+					r.sugar <= '${maxSugar}' AND
+							r.sodium <= '${maxSodium}' AND
+							r.protein <= '${maxProtein}' AND
+							r.saturated_fat <= '${maxSaturatedFat}'
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount};
+		`
+	}
+
 	connection.query(query, (err, rows, fields) => {
-		console.log(query);
 		if (err) console.log(err);
 		else res.json(rows);
 	});
