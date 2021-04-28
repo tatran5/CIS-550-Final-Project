@@ -45,12 +45,7 @@ const NutritionalNeeds = () => {
 					name='nutritions'
 					title={'Nutritions to include'}
 					onInputChange={setNutritions}
-					placeholder='Separate nutritions by comma...' />
-				<InputText
-					name='cooking-time'
-					title={cookingTime.title}
-					onInputChange={setCookTime}
-					placeholder='Enter in minutes...' />
+					placeholder='Ex: 20, 10, 40, 5 for max. amount of sugar, sodium, protein and saturated fat respectively...' />
 				<InputDropdown
 					name='recipe-count'
 					title={recipeCountConsts.title}

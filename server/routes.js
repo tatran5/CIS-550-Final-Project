@@ -25,14 +25,14 @@ const commonIngredients = (req, res) => {
 		else res.json(rows);
 	});
 }
- 
+
 const getRecipes = (req, res) => {
 	const { name, recipeCount, sortBy } = req.query
 	console.log('callinggggg')
 	console.log(req.query)
 	console.log(name)
 	console.log(recipeCount)
-	
+
 	console.log(sortBy)
 	let query = `
 		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
@@ -43,7 +43,7 @@ const getRecipes = (req, res) => {
 		LIMIT ${recipeCount};
 	`
 
-	
+
 	if (sortBy === 'ratings') {
 		query = `
 		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
@@ -54,7 +54,7 @@ const getRecipes = (req, res) => {
 		LIMIT ${recipeCount};
 	`
 	}
-	
+
 	connection.query(query, (err, rows, fields) => {
 		if (err) console.log(err);
 		else res.json(rows);
@@ -171,9 +171,9 @@ const withFewIngredients = (req, res) => {
 		HAVING ingredientCount <= 5
 		ORDER BY ${sortBy} DESC
 		LIMIT ${recipeCount}
-		`	
+		`
 	}
-	
+
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
@@ -188,27 +188,52 @@ const withIngredients = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
-	
-	const query = `
-	WITH ingr_count AS
-	(
-		SELECT recipe_id, COUNT(*) AS num_ingredients
-		FROM has_ingr
-		GROUP BY recipe_id
-	)
-	SELECT r.name, r.ratings, r.minutes, ic.ingredientCount
-	FROM valid_recipes r
-	JOIN ingr_count ic ON r.id = ic.recipe_id
-	WHERE name LIKE '%${ingredients}%' 
-	AND r.name NOT REGEXP '[0-9] [0-9]' 
-	AND r.minutes > 0
-	ORDER BY ${sortBy}
-	LIMIT ${recipeCount};`
-	
+	let query = ''			
+	if (ingredients) {
+		const ingredient0 = ingredients[0] ? ingredients[0] : ''
+		const ingredient1 = ingredients[1] ? ingredients[1] : ''
+		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		query = `				
+		WITH rec_with_ingr AS 
+		(
+			SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
+			FROM has_ingr hi
+			JOIN ingr i ON hi.ingr_id = i.id
+			WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+			GROUP BY hi.recipe_id
+		)
+		SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		JOIN rec_with_ingr rwi ON r.id = rwi.id
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+		`
+
+		if (sortBy === 'ratings' || sortBy === 'includedIngredientsCount') {
+			query = `				
+			WITH rec_with_ingr AS 
+			(
+				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
+				FROM has_ingr hi
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+				GROUP BY hi.recipe_id
+			)
+			SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			JOIN rec_with_ingr rwi ON r.id = rwi.id
+			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		}
+
+	}
+
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
-		console.log(query);
 		if (err) console.log(err);
 		else res.json(rows);
 	});
@@ -221,7 +246,7 @@ const withNutritions = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
-	
+
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {

@@ -6,7 +6,8 @@ const RecipeCard = ({
 		name, 
 		cookingTime, 
 		ingredientCount,
-		rating, 
+		includedIngredientsCount,
+		ratings, 
 		ratingCount, 
 		stepCount, 
 		totalPDV, 
@@ -16,9 +17,10 @@ const RecipeCard = ({
 		<div className='RecipeCard'>
 			<div className='name'> {formatStr(name)} </div>
 			{ cookingTime? <div className='cooking-time'>Cooking time: {cookingTime} min</div> : <></> }
-			{ ingredientCount? 	<div className='ingredient-count'>Number of ingredients: {ingredientCount}</div> : <></> }
+			{ ingredientCount? 	<div className='ingredient-count'>No. of ingredients: {ingredientCount}</div> : <></> }
+			{ includedIngredientsCount? 	<div className='ingredient-count'>No. of input ingredients: {includedIngredientsCount}</div> : <></> }
 			{ stepCount? <div className='step-count'>Number of steps: {stepCount}</div> : <></> }
-			{ rating? <div className='rating'>Rating: {String(rating).substr(0, 3)}/5</div> : <></> }
+			{ ratings? <div className='rating'>Rating: {String(ratings).substr(0, 3)}/5</div> : <></> }
 			{ ratingCount? <div className='rating-count'>Number of ratings: {ratingCount} min</div> : <></>}
 			{ totalPDV? <div className='total-pdv'>Total PDV: {totalPDV}</div> : <></> }
 		</div>)

@@ -15,16 +15,16 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
 app.get('/common-ingredients', routes.commonIngredients)
-app.get('/ingredients', routes.withIngredients)
 app.get('/lowest-time-pdv', routes.lowestTimePDV)
 app.get('/lowest-time-steps', routes.lowestTimeSteps)
 app.get('/nutritions', routes.withNutritions)
 app.get('/random-recipe', routes.randomRecipe)
-app.get('/with-name', routes.getRecipes)
 app.get('/restriction-and-needs', routes.restrictionAndNeeds)
 app.get('/top-recipes', routes.getTopRecipes)
 app.get('/without-ingredients', routes.withoutIngredients)
 app.get('/with-few-ingredients', routes.withFewIngredients)
+app.get('/with-ingredients', routes.withIngredients)
+app.get('/with-name', routes.getRecipes)
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);

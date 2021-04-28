@@ -7,11 +7,21 @@ const cookingTime = {
 	title: 'Cooking time',
 }
 
+const sortByWithIngredients = {
+	title: 'Sort by',
+	rating: 'Ratings',
+	cookingTime: 'Cooking time',
+	ingredientsCount: 'No. of ingredients',
+	includedIngredientsCount: 'No. of input ingredients'
+}
+sortByWithIngredients.options = Object.keys(sortByWithIngredients).map((key) => sortByWithIngredients[key])
+sortByWithIngredients.options = sortByWithIngredients.options.filter(key => key !== sortByWithIngredients.title)
+
 const sortBy = {
 	title: 'Sort by',
-	rating: 'Rating',
+	rating: 'Ratings',
 	cookingTime: 'Cooking time',
-	ingredientsCount: 'Number of ingredients',
+	ingredientsCount: 'No. of ingredients',
 }
 sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
 sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
@@ -21,7 +31,8 @@ const matchCategoryWithDb = (str) => {
 	if (str === sortBy.title) return 'name'
 	if (str === sortBy.rating) return 'ratings'
 	if (str === sortBy.cookingTime) return 'minutes'
-	if (str === sortBy.ingredientsCount) return 'count'
+	if (str === sortBy.ingredientsCount) return 'ingredientsCount'
+	if (str === sortByWithIngredients.includedIngredientsCount) return 'includedIngredientsCount'
 }
 
 const separateInputString = (str) =>
@@ -37,6 +48,7 @@ const formatStr = (name) =>{
 export  {
 	recipeCount,
 	sortBy,
+	sortByWithIngredients,
 	matchCategoryWithDb,
 	cookingTime,
 	separateInputString,
