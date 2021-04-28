@@ -3,7 +3,7 @@ import InputDropdown from './helpers/InputDropdown'
 import InputText from './helpers/InputText'
 import RecipeCard from './helpers/RecipeCard'
 import { 
-	sortBy as sortByConsts, 
+	sortByWithIngredients as sortByConsts, 
 	recipeCount as recipeCountConsts, 
 	matchCategoryWithDb,
 	separateInputString 
