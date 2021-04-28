@@ -7,7 +7,7 @@ import {
 	recipeCount as recipeCountConsts, 
 	matchCategoryWithDb,
 	separateInputString } from './helpers/Consts'
-import '../style/NutritionalNeeds.css'
+import '../style/RestrictionsAndNeeds.css'
 
 const NutritionalNeeds = () => {
 

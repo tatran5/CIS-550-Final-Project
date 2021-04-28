@@ -2,30 +2,27 @@ import React, { useState } from 'react'
 import InputDropdown from './helpers/InputDropdown'
 import InputText from './helpers/InputText'
 import RecipeCard from './helpers/RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, cookingTime, separateInputString } from './helpers/Consts'
+import { 
+	sortBy as sortByConsts, 
+	recipeCount as recipeCountConsts, 
+	matchCategoryWithDb 
+} from './helpers/Consts'
 import '../style/ForDish.css'
+import '../style/RestrictionsAndNeeds.css'
 
 const RestrictionsNeeds = () => {
 	const [restriction, setRestriction] = useState('')
-	const [nutritions, setNutritions] = useState('')
-	const [cookTime, setCookTime] = useState('')
-	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
-	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
+	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
+	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
 	const [recipes, setRecipes] = useState([])
 
 	const fetchResults = () => {
-		const separatedIngredients = separateInputString(nutritions)
 		const params = new URLSearchParams()
-
-		separatedIngredients.forEach(item =>
-			params.append('nutritions[]', item))
-
 		params.append('restriction', restriction)
-		params.append('timeMax', cookTime)
 		params.append('recipeCount', recipeCount)
-		params.append('sortBy', sortBy)
+		params.append('sortBy', matchCategoryWithDb(sortBy))
 
-		fetch('/restriction-and-needs?' + params)
+		fetch('/restriction?' + params)
 			.then(res => {
 				const json = res.json()
 				return json
@@ -42,20 +39,11 @@ const RestrictionsNeeds = () => {
 		<div className='ExcludeIngredients'>
 			<div className='inputs'>
 				<InputText
+					className='restriction'
 					name='restriction'
 					title={'Restriction'}
 					onInputChange={setRestriction}
-					placeholder='Vegan/vegetarian...' />
-				<InputText
-					name='nutritions'
-					title={'Nutritions to include'}
-					onInputChange={setNutritions}
-					placeholder='Separate nutritions by comma...' />
-				<InputText
-					name='cooking-time'
-					title={cookingTime.title}
-					onInputChange={setCookTime}
-					placeholder='Enter in minutes...' />
+					placeholder='Enter restriction such as nuts, meat' />
 				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options} />
 				<InputDropdown name='sort-by' title={sortByConsts.title}

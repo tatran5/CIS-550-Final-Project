@@ -125,28 +125,61 @@ const randomRecipe = (req, res) => {
 	});
 }
 
-const restrictionAndNeeds = (req, res) => {
-	const { restriction, nutritions, timeMax, recipeCount, sortBy } = req.query
-	console.log(restriction)
-	console.log(nutritions) // array of strings
-	console.log(timeMax)
-	console.log(recipeCount)
-	console.log(sortBy)
+const restriction = (req, res) => {
+	const { restriction, recipeCount, sortBy } = req.query
 
-	// TODO: write query and return 
+	let query = `
+	WITH with_restriction AS (
+		SELECT DISTINCT recipe_id
+		FROM has_ingr HI JOIN ingr I ON HI.ingr_id = I.id
+		WHERE I.name IN 
+		(
+			SELECT DISTINCT name
+			FROM ingr
+			WHERE ${restriction} = 1
+		)
+	)
+	SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount, r.ratings, r.minutes
+	FROM valid_recipes r
+	JOIN ingr_count ic ON r.id = ic.recipe_id
+	WHERE r.id NOT IN 
+		( 
+		SELECT * 
+		FROM with_restriction 
+		)
+	ORDER BY ${sortBy}
+	LIMIT ${recipeCount};
+	`
+	if (sortBy === 'ratings') {
+		query = `
+		WITH with_restriction AS (
+			SELECT DISTINCT recipe_id
+			FROM has_ingr HI JOIN ingr I ON HI.ingr_id = I.id
+			WHERE I.name IN 
+			(
+				SELECT DISTINCT name
+				FROM ingr
+				WHERE ${restriction} = 1
+			)
+		)
+		SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount,  r.ratings, r.minutes
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.id NOT IN 
+			( 
+			SELECT * 
+			FROM with_restriction 
+			)
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+		`
+	}
+
 	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	connection.query(query, (err, rows, fields) => {
+	  if (err) console.log(err);
+	  else res.json(results);
+	});
 }
 
 const withFewIngredients = (req, res) => {
@@ -228,11 +261,8 @@ const withIngredients = (req, res) => {
 			LIMIT ${recipeCount};
 			`
 		}
-
 	}
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
 		if (err) console.log(err);
 		else res.json(rows);
@@ -282,16 +312,6 @@ const withNutritions = (req, res) => {
 		if (err) console.log(err);
 		else res.json(rows);
 	});
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	/*
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
-	*/
 }
 
 const withoutIngredients = (req, res) => {
@@ -300,20 +320,54 @@ const withoutIngredients = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
+	let query = ''			
+	if (ingredients) {
+		const ingredient0 = ingredients[0] ? ingredients[0] : ''
+		const ingredient1 = ingredients[1] ? ingredients[1] : ''
+		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		query = `				
+			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			WHERE id NOT IN 
+			(
+				SELECT DISTINCT r.id
+				FROM valid_recipes r
+				JOIN has_ingr hi ON r.id = hi.ingr_id
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%'
+				OR i.name LIKE '%${ingredient1}%'
+				OR i.name LIKE '%${ingredient2}%'
+			)
+			ORDER BY ${sortBy}
+			LIMIT ${recipeCount};
+		`
 
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+		if (sortBy === 'ratings') {
+			query = `				
+			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			WHERE id NOT IN 
+			(
+				SELECT DISTINCT r.id
+				FROM valid_recipes r
+				JOIN has_ingr hi ON r.id = hi.ingr_id
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%'
+				OR i.name LIKE '%${ingredient1}%'
+				OR i.name LIKE '%${ingredient2}%'
+			)
+			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		}
+	}
+
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 module.exports = {
@@ -323,7 +377,7 @@ module.exports = {
 	lowestTimePDV: lowestTimePDV,
 	lowestTimeSteps: lowestTimeSteps,
 	randomRecipe: randomRecipe,
-	restrictionAndNeeds: restrictionAndNeeds,
+	restriction: restriction,
 	withFewIngredients: withFewIngredients,
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
