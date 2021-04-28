@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import InputDropdown from './InputDropdown'
-import InputText from './InputText'
-import RecipeCard from './RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts } from './Consts.js'
+import InputDropdown from './helpers/InputDropdown'
+import InputText from './helpers/InputText'
+import RecipeCard from './helpers/RecipeCard'
+import { sortBy as sortByConsts, recipeCount as recipeCountConsts } from './helpers/Consts'
 
 const ForTimeSteps = () => {
 	const [recipes, setRecipes] = useState([])

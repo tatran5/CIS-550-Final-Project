@@ -1,30 +1,34 @@
 import React, { useState } from 'react'
-import InputDropdown from './InputDropdown'
-import InputText from './InputText'
-import RecipeCard from './RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, cookingTime } from './Consts.js'
+import InputDropdown from './helpers/InputDropdown'
+import InputText from './helpers/InputText'
+import RecipeCard from './helpers/RecipeCard'
+import {
+	sortBy as sortByConsts,
+	recipeCount as recipeCountConsts,
+	matchCategoryWithDb
+} from './helpers/Consts'
 import '../style/ForDish.css'
 
 const ForDish = () => {
 
 	const [dishName, setDishName] = useState('')
-	const [cookTime, setCookTime] = useState('')
 	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
 	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
 	const [recipes, setRecipes] = useState([])
 
 	const fetchResults = () => {
-		fetch(`/recipes?'` + new URLSearchParams({
-			name: dishName,
-			timeMax: cookTime,
-			recipeCount: recipeCount,
-			sortBy: sortBy
-		}))
+		fetch(`/with-name?`
+			+ new URLSearchParams({
+				recipeCount: recipeCount,
+				sortBy: matchCategoryWithDb(sortBy),
+				name: dishName,
+			}))
 			.then(res => {
 				const json = res.json()
 				return json
 			})
 			.then(data => {
+				console.log(data)
 				setRecipes(data)
 			})
 			.catch(e => {
@@ -42,11 +46,6 @@ const ForDish = () => {
 					title={'Dish name'}
 					onInputChange={setDishName}
 					placeholder='Enter the dish name here...' />
-				<InputText
-					name='cooking-time'
-					title={cookingTime.title}
-					onInputChange={setCookTime}
-					placeholder='Enter in minutes...' />
 				<InputDropdown
 					name='recipe-count'
 					title={recipeCountConsts.title}
@@ -59,15 +58,15 @@ const ForDish = () => {
 					options={sortByConsts.options} />
 				<div className='button' onClick={_ => fetchResults()}>Find</div>
 			</div>
-			<div className='results'>
+			<div className='results-container'>
 				{recipes.map((recipe, i) =>
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
+							cookingTime={recipe.minutes}
+							ingredientCount={recipe.ingredientsCount}
 							stepCount={recipe.stepCount}
-							rating={recipe.rating}
+							rating={recipe.ratings}
 							ratingCount={recipe.ratingCount}
 						/>
 						<br />

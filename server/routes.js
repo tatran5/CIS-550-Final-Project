@@ -8,200 +8,90 @@ const connection = mysql.createPool(config);
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
-
-/* ---- Q1a (Dashboard) ---- */
-// Equivalent to: function getTop20Keywords(req, res) {}
-const getTop20Keywords = (req, res) => {
-	const query = `
-    SELECT kwd_name
-    FROM movie_keyword
-    GROUP BY kwd_name
-    ORDER BY COUNT(*) DESC
-    LIMIT 20;
-  `
-
-	connection.query(query, function (err, rows, fields) {
-		if (err) console.log(err);
-		else {
-			res.json(rows)
-		}
-	});
-};
-
-
-/* ---- Q1b (Dashboard) ---- */
-const getTopMoviesWithKeyword = (req, res) => {
-	const query = `
-    SELECT DISTINCT title, rating, num_ratings
-    FROM  movie_keyword NATURAL JOIN movie
-    WHERE kwd_name = '${req.params.keyword}'
-    ORDER BY rating DESC, num_ratings DESC
-    LIMIT 10;
-  `
-	connection.query(query, function (err, rows, fields) {
-		if (err) console.log(err)
-		else {
-			res.json(rows)
-		}
-	});
-};
-
-
-/* ---- Q2 (Recommendations) ---- */
-const getRecs = (req, res) => {
-	const query = `
-    WITH cast_in_req AS (
-      SELECT DISTINCT cast_id
-      FROM cast_in NATURAL JOIN movie
-      WHERE title = '${req.params.movie}'
-    ) 
-    SELECT DISTINCT title, movie_id, rating, num_ratings
-    FROM cast_in
-    NATURAL JOIN cast_in_req
-    NATURAL JOIN movie
-    WHERE title != '${req.params.movie}'
-    GROUP BY title, movie_id, rating, num_ratings
-    ORDER BY COUNT(cast_id) DESC, rating DESC, num_ratings DESC
-    LIMIT 10;
-  `
-
-	connection.query(query, function (err, rows, fields) {
-		if (err) console.log(err)
-		else {
-			res.json(rows)
-		}
-	});
-};
-
-
-/* ---- Q3a (Best Movies) ---- */
-const getDecades = (req, res) => {
-	const query = `
-    SELECT DISTINCT FLOOR(release_year DIV 10) * 10 AS decade
-    FROM movie
-    ORDER BY decade;
-  `
-	connection.query(query, function (err, rows, fields) {
-		if (err) console.log(err)
-		else {
-			res.json(rows)
-		}
-	});
-};
-
-
-/* ---- (Best Movies) ---- */
-const getGenres = (req, res) => {
-	const query = `
-    SELECT name
-    FROM genre
-    WHERE name <> 'genres'
-    ORDER BY name ASC;
-  `;
-
-	connection.query(query, (err, rows, fields) => {
-		if (err) console.log(err);
-		else res.json(rows);
-	});
-};
-
-
-/* ---- Q3b (Best Movies) ---- */
-const bestMoviesPerDecadeGenre = (req, res) => {
-	//  A best movie M is defined to be a movie where the rating of M must be larger
-	// than the average rating of each genre M belongs to for that given decade.
-	//  The user selects the decade as 2010 and genre as Action. Consider Avengers: Age of Ultron ,
-	// which is an action movie released in 2015. Avengers: Age of Ultron also belongs to the genres
-	// Adventure and Sci-Fi. In the decade 2010, the average rating for the Action genre was 5.80,
-	// Adventure was 6.03, and Sci-Fi was 5.54. Avengers: Age of Ultron had a rating of 7, which
-	// means that it should be returned in the query since its own rating was larger than the rating of
-	// each of the genres it belongs to for that decade.
-	//  Now consider another movie 009 Re: Cyborg which is also a movie that was released in the
-	// decade 2010 (in 2012) and belongs to the Action genre. 009 Re: Cyborg also belongs to the
-	// genres Animation and Sci-Fi. In the decade 2010, the average rating for the Action genre was
-	// 5.80, Animation was 6.69, and Sci-Fi was 5.54. 009 Re: Cyborg had a rating of 6, which means
-	// it should not be returned, since it does not have a higher rating than the Animation genre for the
-	// decade 2010.
-	const decade = req.params.decade
-	const genre = req.params.genre
-	console.log(`decade ${decade}`)
-	console.log(`genre ${genre}`)
-
-	// First get average rating per genre in decade using WITH
-	const query = `
-    WITH avg_rating_per_genre_in_decade AS (
-      SELECT genre_name, AVG(rating) AS avg_rating
-      FROM movie_genre mg JOIN movie m ON mg.movie_id = m.movie_id
-      WHERE m.release_year >= ${decade} AND m.release_year < ${decade} + 10  
-      GROUP BY mg.genre_name
-    ), better_than_avg_movie_in_genre AS (
-      SELECT m.title, m.movie_id, m.release_year, m.rating, mg.genre_name
-      FROM movie_genre mg
-      JOIN movie m ON mg.movie_id = m.movie_id
-      JOIN avg_rating_per_genre_in_decade ar ON mg.genre_name = ar.genre_name
-      WHERE m.rating > ar.avg_rating AND (m.movie_id) IN (
-        SELECT movie_id
-        FROM movie_genre NATURAL JOIN movie
-        WHERE genre_name = '${genre}'
-      )
-    ), genre_count_per_movie AS (
-      SELECT movie_id, COUNT(genre_name) AS genre_count
-      FROM movie_genre
-      GROUP BY movie_id
-    )
-    SELECT title, movie_id, rating
-    FROM better_than_avg_movie_in_genre NATURAL JOIN genre_count_per_movie
-    WHERE release_year >= ${decade} AND release_year < ${decade} + 10 
-    GROUP BY title, movie_id, rating, genre_count
-    HAVING COUNT(genre_name) = genre_count
-    ORDER BY title
-    LIMIT 100
-  `;
-
-	connection.query(query, (err, rows, fields) => {
-		if (err) console.log(err);
-		else res.json(rows);
-	});
-};
-
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
+
+const commonIngredients = (req, res) => {
+	const query = `
+	SELECT i.name, COUNT(*) as count
+	FROM valid_recipes r
+	JOIN has_ingr hi ON r.id = hi.recipe_id
+	JOIN ingr i ON hi.ingr_id = i.id 
+	GROUP BY i.id 
+	ORDER BY count DESC
+	LIMIT 10;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
+}
+
 const getRecipes = (req, res) => {
-	console.log('Inside getRecipe')
-	const { name, timeMax, recipeCount, sortBy } = req.query
+	const { name, recipeCount, sortBy } = req.query
+	console.log('callinggggg')
+	console.log(req.query)
+	console.log(name)
 	console.log(recipeCount)
+
 	console.log(sortBy)
+	let query = `
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE name LIKE '%${name}%' 
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+	`
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
 
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	if (sortBy === 'ratings') {
+		query = `
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE name LIKE '%${name}%' 
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount};
+	`
+	}
+
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
+}
+
+const getTopRecipes = (req, res) => {
+	const query = `
+	SELECT name, ratings
+	FROM valid_recipes
+	ORDER BY ratings DESC
+	LIMIT 5;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const lowestTimePDV = (req, res) => {
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	const query = `
+	WITH min_minutes AS 
+	(
+		SELECT name, minutes, total_fat, sugar, sodium, protein
+		FROM valid_recipes
+		ORDER BY minutes ASC
+		LIMIT 10
+	)
+	SELECT name, minutes, (total_fat + sugar + sodium + protein) AS totalPDV
+	FROM min_minutes
+	WHERE (total_fat + sugar + sodium + protein) > 0
+	ORDER BY totalPDV ASC;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const lowestTimeSteps = (req, res) => {
@@ -221,28 +111,108 @@ const lowestTimeSteps = (req, res) => {
 	res.json(results)
 }
 
-const restrictionAndNeeds = (req, res) => {
-	const { restriction, nutritions, timeMax, recipeCount, sortBy } = req.query
-	console.log(restriction)
-	console.log(nutritions) // array of strings
-	console.log(timeMax)
-	console.log(recipeCount)
-	console.log(sortBy)
+const randomRecipe = (req, res) => {
+	console.log('randomRecipe called')
+	const query = `
+	SELECT name
+	FROM valid_recipes
+	ORDER BY RAND()
+	LIMIT 1;
+	`
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
+}
+
+const restriction = (req, res) => {
+	const { restriction, recipeCount, sortBy } = req.query
+
+	let query = `
+	WITH with_restriction AS (
+		SELECT DISTINCT recipe_id
+		FROM has_ingr HI JOIN ingr I ON HI.ingr_id = I.id
+		WHERE I.name IN 
+		(
+			SELECT DISTINCT name
+			FROM ingr
+			WHERE is_${restriction} = 1
+		)
+	)
+	SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount, r.ratings, r.minutes
+	FROM valid_recipes r
+	JOIN ingr_count ic ON r.id = ic.recipe_id
+	WHERE r.id NOT IN 
+		( 
+		SELECT * 
+		FROM with_restriction 
+		)
+	ORDER BY ${sortBy}
+	LIMIT ${recipeCount};
+	`
+	if (sortBy === 'ratings') {
+		query = `
+		WITH with_restriction AS (
+			SELECT DISTINCT recipe_id
+			FROM has_ingr HI JOIN ingr I ON HI.ingr_id = I.id
+			WHERE I.name IN 
+			(
+				SELECT DISTINCT name
+				FROM ingr
+				WHERE is_${restriction} = 1
+			)
+		)
+		SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount,  r.ratings, r.minutes
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.id NOT IN 
+			( 
+			SELECT * 
+			FROM with_restriction 
+			)
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount};
+		`
+	}
+
+	// Follow the examples in hw2 to return 
+	connection.query(query, (err, rows, fields) => {
+	  if (err) console.log(err);
+	  else res.json(rows);
+	});
+}
+
+const withFewIngredients = (req, res) => {
+	const { recipeCount, sortBy } = req.query
+
+	let query = `
+	SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
+	FROM valid_recipes r 
+	JOIN has_ingr hi ON r.id = hi.recipe_id
+	GROUP BY r.id 
+	HAVING ingredientCount <= 5
+	ORDER BY ${sortBy}
+	LIMIT ${recipeCount}
+	`
+
+	if (sortBy === 'ratings') {
+		query = `
+		SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
+		FROM valid_recipes r 
+		JOIN has_ingr hi ON r.id = hi.recipe_id
+		GROUP BY r.id 
+		HAVING ingredientCount <= 5
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount}
+		`
+	}
 
 	// TODO: write query and return 
 	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const withIngredients = (req, res) => {
@@ -251,43 +221,97 @@ const withIngredients = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
+	let query = ''			
+	if (ingredients) {
+		const ingredient0 = ingredients[0] ? ingredients[0] : ''
+		const ingredient1 = ingredients[1] ? ingredients[1] : ''
+		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		query = `				
+		WITH rec_with_ingr AS 
+		(
+			SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
+			FROM has_ingr hi
+			JOIN ingr i ON hi.ingr_id = i.id
+			WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+			GROUP BY hi.recipe_id
+		)
+		SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		JOIN rec_with_ingr rwi ON r.id = rwi.id
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+		`
 
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+		if (sortBy === 'ratings' || sortBy === 'includedIngredientsCount') {
+			query = `				
+			WITH rec_with_ingr AS 
+			(
+				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
+				FROM has_ingr hi
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+				GROUP BY hi.recipe_id
+			)
+			SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			JOIN rec_with_ingr rwi ON r.id = rwi.id
+			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		}
+	}
+
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const withNutritions = (req, res) => {
-	const { nutritions, timeMax, recipeCount, sortBy} = req.query
+	const { nutritions, recipeCount, sortBy } = req.query
 	console.log(nutritions) // array of strings
-	console.log(timeMax)
 	console.log(recipeCount)
 	console.log(sortBy)
+	const maxSugar = nutritions[0]
+	const maxSodium = nutritions[1]
+	const maxProtein = nutritions[2]
+	const maxSaturatedFat = nutritions[3]
+	const maxTotalFat = nutritions[4]
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
+	let query = `	
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.total_fat <= '${maxTotalFat}' AND
+					r.sugar <= '${maxSugar}' AND
+							r.sodium <= '${maxSodium}' AND
+							r.protein <= '${maxProtein}' AND
+							r.saturated_fat <= '${maxSaturatedFat}'
+		ORDER BY ${sortBy}
+		LIMIT ${recipeCount};
+	`
 
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+	if (sortBy === 'ratings') {
+		query = `	
+		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
+		FROM valid_recipes r
+		JOIN ingr_count ic ON r.id = ic.recipe_id
+		WHERE r.total_fat <= '${maxTotalFat}' AND
+					r.sugar <= '${maxSugar}' AND
+							r.sodium <= '${maxSodium}' AND
+							r.protein <= '${maxProtein}' AND
+							r.saturated_fat <= '${maxSaturatedFat}'
+		ORDER BY ${sortBy} DESC
+		LIMIT ${recipeCount};
+		`
+	}
+
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 const withoutIngredients = (req, res) => {
@@ -296,33 +320,65 @@ const withoutIngredients = (req, res) => {
 	console.log(recipeCount)
 	console.log(sortBy)
 
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
+	let query = ''			
+	if (ingredients) {
+		const ingredient0 = ingredients[0] ? ingredients[0] : ''
+		const ingredient1 = ingredients[1] ? ingredients[1] : ''
+		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		query = `				
+			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			WHERE id NOT IN 
+			(
+				SELECT DISTINCT r.id
+				FROM valid_recipes r
+				JOIN has_ingr hi ON r.id = hi.ingr_id
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%'
+				OR i.name LIKE '%${ingredient1}%'
+				OR i.name LIKE '%${ingredient2}%'
+			)
+			ORDER BY ${sortBy}
+			LIMIT ${recipeCount};
+		`
 
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
+		if (sortBy === 'ratings') {
+			query = `				
+			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
+			FROM valid_recipes r
+			JOIN ingr_count ic ON r.id = ic.recipe_id
+			WHERE id NOT IN 
+			(
+				SELECT DISTINCT r.id
+				FROM valid_recipes r
+				JOIN has_ingr hi ON r.id = hi.ingr_id
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%'
+				OR i.name LIKE '%${ingredient1}%'
+				OR i.name LIKE '%${ingredient2}%'
+			)
+			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		}
+	}
+
+	connection.query(query, (err, rows, fields) => {
+		if (err) console.log(err);
+		else res.json(rows);
+	});
 }
 
 module.exports = {
-	getTop20Keywords: getTop20Keywords,
-	getTopMoviesWithKeyword: getTopMoviesWithKeyword,
-	getRecs: getRecs,
-	getDecades: getDecades,
-	getGenres: getGenres,
-	bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
+	commonIngredients: commonIngredients,
 	getRecipes: getRecipes,
+	getTopRecipes: getTopRecipes,
 	lowestTimePDV: lowestTimePDV,
 	lowestTimeSteps: lowestTimeSteps,
-	restrictionAndNeeds: restrictionAndNeeds,
+	randomRecipe: randomRecipe,
+	restriction: restriction,
+	withFewIngredients: withFewIngredients,
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
 	withoutIngredients: withoutIngredients,

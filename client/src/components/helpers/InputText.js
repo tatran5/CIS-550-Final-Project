@@ -1,7 +1,8 @@
 import React from 'react'
-import '../style/InputText.css'
+import '../../style/InputText.css'
 
 const InputText = ({ name, onInputChange, title, placeholder }) => {
+	
 	return (
 		<div className={`input-container ${name}`}>
 			<div className='input-title'>{title}</div>

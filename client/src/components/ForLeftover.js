@@ -1,8 +1,13 @@
 import React, { useState } from 'react'
-import InputDropdown from './InputDropdown'
-import InputText from './InputText'
-import RecipeCard from './RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, separateInputString } from './Consts.js'
+import InputDropdown from './helpers/InputDropdown'
+import InputText from './helpers/InputText'
+import RecipeCard from './helpers/RecipeCard'
+import { 
+	sortByWithIngredients as sortByConsts, 
+	recipeCount as recipeCountConsts, 
+	matchCategoryWithDb,
+	separateInputString 
+} from './helpers/Consts'
 import '../style/ForLeftover.css'
 
 const ForLeftover = () => {
@@ -20,9 +25,10 @@ const ForLeftover = () => {
 			params.append('ingredients[]', item))
 		
 		params.append('recipeCount', recipeCount)
-		params.append('sortBy', sortBy)
+		params.append('sortBy', matchCategoryWithDb(sortBy))
+		console.log(sortBy)
 
-		fetch('/ingredients?' + params)
+		fetch('/with-ingredients?' + params)
 			.then(res => {
 				const json = res.json()
 				return json
@@ -43,7 +49,7 @@ const ForLeftover = () => {
 					name='ingredients'
 					title={'Ingredients'}
 					onInputChange={setIngredients}
-					placeholder='Separate ingredients by comma...' />
+					placeholder='Input up to 3 ingredients and separate them by comma...' />
 				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options} />
 				<InputDropdown name='sort-by' title={sortByConsts.title}
@@ -55,10 +61,11 @@ const ForLeftover = () => {
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
+							cookingTime={recipe.minutes}
+							ingredientCount={recipe.ingredientsCount}
+							includedIngredientsCount={recipe.includedIngredientsCount}
 							stepCount={recipe.stepCount}
-							rating={recipe.rating}
+							rating={recipe.ratings}
 							ratingCount={recipe.ratingCount}
 						/>
 						<br />

@@ -1,16 +1,18 @@
 import React, { useState } from 'react'
-import InputDropdown from './InputDropdown'
-import InputText from './InputText'
-import RecipeCard from './RecipeCard'
-import { sortBy as sortByConsts, recipeCount as recipeCountConsts, cookingTime } from './Consts.js'
+import InputDropdown from './helpers/InputDropdown'
+import InputText from './helpers/InputText'
+import RecipeCard from './helpers/RecipeCard'
+import { 
+	sortBy as sortByConsts, 
+	recipeCount as recipeCountConsts,
+	matchCategoryWithDb } from './helpers/Consts'
 import '../style/ForDish.css'
 
 const ExcludeIngredients = () => {
 
 	const [ingredients, setIngredients] = useState('')
-	const [cookTime, setCookTime] = useState('')
-	const [recipeCount, setRecipeCount] = useState(sortByConsts.options[0])
-	const [sortBy, setSortBy] = useState(recipeCountConsts.options[0])
+	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
+	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
 	const [recipes, setRecipes] = useState([])
 
 	// Process input ingredients from a string with commas
@@ -26,9 +28,8 @@ const ExcludeIngredients = () => {
 		separatedIngredients.forEach(item =>
 			params.append('ingredients[]', item))
 
-		params.append('timeMax', cookTime)
 		params.append('recipeCount', recipeCount)
-		params.append('sortBy', sortBy)
+		params.append('sortBy', matchCategoryWithDb(sortBy))
 
 		fetch('/without-ingredients?' + params)
 			.then(res => {
@@ -51,12 +52,7 @@ const ExcludeIngredients = () => {
 					name='ingredients'
 					title={'Ingredients to exclude'}
 					onInputChange={setIngredients}
-					placeholder='Separate ingredients by comma...' />
-				<InputText
-					name='cooking-time'
-					title={cookingTime.title}
-					onInputChange={setCookTime}
-					placeholder='Enter in minutes...' />
+					placeholder='Input up to 3 ingredients and separate them by comma...' />
 				<InputDropdown
 					name='recipe-count'
 					title={recipeCountConsts.title}
@@ -74,10 +70,10 @@ const ExcludeIngredients = () => {
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
+							cookingTime={recipe.minutes}
+							ingredientCount={recipe.ingredientsCount}
 							stepCount={recipe.stepCount}
-							rating={recipe.rating}
+							rating={recipe.ratings}
 							ratingCount={recipe.ratingCount}
 						/>
 						<br />
