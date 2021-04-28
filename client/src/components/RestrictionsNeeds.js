@@ -55,10 +55,10 @@ const RestrictionsNeeds = () => {
 					<div key={`recipe-${i}`}>
 						<RecipeCard
 							name={recipe.name}
-							cookingTime={recipe.time}
-							ingredientCount={recipe.ingredientCount}
+							cookingTime={recipe.minutes}
+							ingredientCount={recipe.ingredientsCount}
 							stepCount={recipe.stepCount}
-							rating={recipe.rating}
+							rating={recipe.ratings}
 							ratingCount={recipe.ratingCount}
 						/>
 						<br />

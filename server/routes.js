@@ -136,7 +136,7 @@ const restriction = (req, res) => {
 		(
 			SELECT DISTINCT name
 			FROM ingr
-			WHERE ${restriction} = 1
+			WHERE is_${restriction} = 1
 		)
 	)
 	SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount, r.ratings, r.minutes
@@ -159,7 +159,7 @@ const restriction = (req, res) => {
 			(
 				SELECT DISTINCT name
 				FROM ingr
-				WHERE ${restriction} = 1
+				WHERE is_${restriction} = 1
 			)
 		)
 		SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount,  r.ratings, r.minutes
@@ -170,7 +170,7 @@ const restriction = (req, res) => {
 			SELECT * 
 			FROM with_restriction 
 			)
-		ORDER BY ${sortBy}
+		ORDER BY ${sortBy} DESC
 		LIMIT ${recipeCount};
 		`
 	}
@@ -178,7 +178,7 @@ const restriction = (req, res) => {
 	// Follow the examples in hw2 to return 
 	connection.query(query, (err, rows, fields) => {
 	  if (err) console.log(err);
-	  else res.json(results);
+	  else res.json(rows);
 	});
 }
 
