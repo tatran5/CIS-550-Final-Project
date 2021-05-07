@@ -26,6 +26,14 @@ const sortBy = {
 sortBy.options = Object.keys(sortBy).map((key) => sortBy[key])
 sortBy.options = sortBy.options.filter(key => key !== sortBy.title)
 
+const restrictions = {
+	title: 'Restriction',
+	nut: 'Nut',
+	meat: 'Meat',
+}
+restrictions.options = Object.keys(restrictions).map((key) => restrictions[key])
+restrictions.options = restrictions.options.filter(key => key !== restrictions.title)
+
 const matchCategoryWithDb = (str) => {
 	// for sort by
 	if (str === sortBy.title) return 'name'
@@ -33,6 +41,8 @@ const matchCategoryWithDb = (str) => {
 	if (str === sortBy.cookingTime) return 'minutes'
 	if (str === sortBy.ingredientsCount) return 'ingredientsCount'
 	if (str === sortByWithIngredients.includedIngredientsCount) return 'includedIngredientsCount'
+	if (str === restrictions.nut) return 'nut'
+	if (str === restrictions.meat) return 'meat'
 }
 
 const separateInputString = (str) =>
@@ -45,8 +55,10 @@ const formatStr = (name) =>{
 		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(' ')
 }
+
 export  {
 	recipeCount,
+	restrictions,
 	sortBy,
 	sortByWithIngredients,
 	matchCategoryWithDb,

@@ -37,11 +37,7 @@ const ForTimePDV = () => {
 			<div className='results-container'>
 				{recipes.map((recipe, i) =>
 					<div key={`recipe-${i}`}>
-						<RecipeCard
-							name={recipe.name}
-							cookingTime={recipe.minutes}
-							totalPDV={recipe.totalPDV}
-						/>
+						<RecipeCard recipe={recipe}/>
 						<br />
 					</div>
 				)}

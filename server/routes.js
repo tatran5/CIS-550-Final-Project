@@ -35,7 +35,7 @@ const getRecipes = (req, res) => {
 
 	console.log(sortBy)
 	let query = `
-		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		SELECT r.id, r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
 		FROM valid_recipes r
 		JOIN ingr_count ic ON r.id = ic.recipe_id
 		WHERE name LIKE '%${name}%' 
@@ -46,7 +46,7 @@ const getRecipes = (req, res) => {
 
 	if (sortBy === 'ratings') {
 		query = `
-		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
+		SELECT r.id, r.name, r.ratings, r.minutes, ic.num_ingredients AS ingredientsCount
 		FROM valid_recipes r
 		JOIN ingr_count ic ON r.id = ic.recipe_id
 		WHERE name LIKE '%${name}%' 
@@ -63,7 +63,7 @@ const getRecipes = (req, res) => {
 
 const getTopRecipes = (req, res) => {
 	const query = `
-	SELECT name, ratings
+	SELECT id, name, ratings
 	FROM valid_recipes
 	ORDER BY ratings DESC
 	LIMIT 5;
@@ -78,12 +78,12 @@ const lowestTimePDV = (req, res) => {
 	const query = `
 	WITH min_minutes AS 
 	(
-		SELECT name, minutes, total_fat, sugar, sodium, protein
+		SELECT id, name, minutes, total_fat, sugar, sodium, protein, ratings
 		FROM valid_recipes
 		ORDER BY minutes ASC
 		LIMIT 10
 	)
-	SELECT name, minutes, (total_fat + sugar + sodium + protein) AS totalPDV
+	SELECT id, name, minutes, ratings, (total_fat + sugar + sodium + protein) AS totalPDV
 	FROM min_minutes
 	WHERE (total_fat + sugar + sodium + protein) > 0
 	ORDER BY totalPDV ASC;
@@ -114,7 +114,7 @@ const lowestTimeSteps = (req, res) => {
 const randomRecipe = (req, res) => {
 	console.log('randomRecipe called')
 	const query = `
-	SELECT name
+	SELECT id, name
 	FROM valid_recipes
 	ORDER BY RAND()
 	LIMIT 1;
@@ -138,17 +138,22 @@ const restriction = (req, res) => {
 			FROM ingr
 			WHERE is_${restriction} = 1
 		)
+	), rating_ratio AS (
+		SELECT r.id, r.ratings / r.num_rating AS ratio
+	FROM valid_recipes r
+	ORDER BY ratio
 	)
-	SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount, r.ratings, r.minutes
+	SELECT r.id, r.name, r.n_ingredients AS includedIngredients, ic.num_ingr_total AS ingredientsCount, rr.ratio, r.minutes
 	FROM valid_recipes r
 	JOIN ingr_count ic ON r.id = ic.recipe_id
+	JOIN rating_ratio rr ON r.id = rr.id
 	WHERE r.id NOT IN 
 		( 
 		SELECT * 
 		FROM with_restriction 
 		)
 	ORDER BY ${sortBy}
-	LIMIT ${recipeCount};
+	LIMIT ${recipeCount};	
 	`
 	if (sortBy === 'ratings') {
 		query = `
@@ -161,17 +166,22 @@ const restriction = (req, res) => {
 				FROM ingr
 				WHERE is_${restriction} = 1
 			)
+		), rating_ratio AS (
+			SELECT r.id, r.ratings / r.num_rating AS ratio
+		FROM valid_recipes r
+		ORDER BY ratio
 		)
-		SELECT DISTINCT r.name, r.n_ingredients AS ingredientsCount,  r.ratings, r.minutes
+		SELECT r.id, r.name, r.n_ingredients AS includedIngredients, ic.num_ingr_total AS ingredientsCount, rr.ratio, r.minutes
 		FROM valid_recipes r
 		JOIN ingr_count ic ON r.id = ic.recipe_id
+		JOIN rating_ratio rr ON r.id = rr.id
 		WHERE r.id NOT IN 
 			( 
 			SELECT * 
 			FROM with_restriction 
 			)
 		ORDER BY ${sortBy} DESC
-		LIMIT ${recipeCount};
+		LIMIT ${recipeCount};	
 		`
 	}
 
@@ -186,22 +196,22 @@ const withFewIngredients = (req, res) => {
 	const { recipeCount, sortBy } = req.query
 
 	let query = `
-	SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
+	SELECT r.id, r.name, COUNT(*) AS ingredientsCount, r.ratings, r.minutes
 	FROM valid_recipes r 
 	JOIN has_ingr hi ON r.id = hi.recipe_id
 	GROUP BY r.id 
-	HAVING ingredientCount <= 5
+	HAVING ingredientsCount <= 5
 	ORDER BY ${sortBy}
 	LIMIT ${recipeCount}
 	`
 
 	if (sortBy === 'ratings') {
 		query = `
-		SELECT r.name, COUNT(*) AS ingredientCount, r.ratings, r.minutes
+		SELECT r.id, r.name, COUNT(*) AS ingredientsCount, r.ratings, r.minutes
 		FROM valid_recipes r 
 		JOIN has_ingr hi ON r.id = hi.recipe_id
 		GROUP BY r.id 
-		HAVING ingredientCount <= 5
+		HAVING ingredientsCount <= 5
 		ORDER BY ${sortBy} DESC
 		LIMIT ${recipeCount}
 		`
@@ -232,13 +242,23 @@ const withIngredients = (req, res) => {
 			SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
 			FROM has_ingr hi
 			JOIN ingr i ON hi.ingr_id = i.id
-			WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+			WHERE i.name LIKE '% ${ingredient0}%' 
+				OR i.name LIKE '% ${ingredient1}%' 
+				OR i.name LIKE '% ${ingredient2}%'
+				OR i.name LIKE '${ingredient0}%' 
+				OR i.name LIKE '${ingredient1}%'
+				OR i.name LIKE '${ingredient2}%' 
 			GROUP BY hi.recipe_id
+		), rating_ratio AS (
+			SELECT r.id, r.ratings / r.num_rating AS ratio
+		FROM valid_recipes r
+		ORDER BY ratio
 		)
-		SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+		SELECT r.id, r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
 		FROM valid_recipes r
 		JOIN ingr_count ic ON r.id = ic.recipe_id
 		JOIN rec_with_ingr rwi ON r.id = rwi.id
+		JOIN rating_ratio rr ON r.id = rr.id
 		ORDER BY ${sortBy}
 		LIMIT ${recipeCount};
 		`
@@ -250,13 +270,23 @@ const withIngredients = (req, res) => {
 				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
 				FROM has_ingr hi
 				JOIN ingr i ON hi.ingr_id = i.id
-				WHERE i.name LIKE '%${ingredient0}%' OR '%${ingredient1}%' OR '%${ingredient2}%'
+				WHERE i.name LIKE '% ${ingredient0}%' 
+					OR i.name LIKE '% ${ingredient1}%' 
+					OR i.name LIKE '% ${ingredient2}%'
+					OR i.name LIKE '${ingredient0}%' 
+					OR i.name LIKE '${ingredient1}%'
+					OR i.name LIKE '${ingredient2}%' 
 				GROUP BY hi.recipe_id
+			), rating_ratio AS (
+				SELECT r.id, r.ratings / r.num_rating AS ratio
+			FROM valid_recipes r
+			ORDER BY ratio
 			)
-			SELECT DISTINCT r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
+			SELECT r.id, r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
 			FROM valid_recipes r
 			JOIN ingr_count ic ON r.id = ic.recipe_id
 			JOIN rec_with_ingr rwi ON r.id = rwi.id
+			JOIN rating_ratio rr ON r.id = rr.id
 			ORDER BY ${sortBy} DESC
 			LIMIT ${recipeCount};
 			`
@@ -281,28 +311,46 @@ const withNutritions = (req, res) => {
 	const maxTotalFat = nutritions[4]
 
 	let query = `	
-		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
-		FROM valid_recipes r
-		JOIN ingr_count ic ON r.id = ic.recipe_id
-		WHERE r.total_fat <= '${maxTotalFat}' AND
-					r.sugar <= '${maxSugar}' AND
-							r.sodium <= '${maxSodium}' AND
-							r.protein <= '${maxProtein}' AND
-							r.saturated_fat <= '${maxSaturatedFat}'
+		WITH good_recipes AS (
+			SELECT r.id, r.name, r.ratings, r.minutes
+			FROM valid_recipes r
+			WHERE r.total_fat <= '${maxTotalFat}' AND
+				r.sugar <= '${maxSugar}' AND
+					r.sodium <= '${maxSodium}' AND
+					r.protein <= '${maxProtein}' AND
+					r.saturated_fat <= '${maxSaturatedFat}'
+		), rating_ratio AS (
+			SELECT r.id, r.ratings / r.num_rating AS ratio
+			FROM valid_recipes r
+			ORDER BY ratio
+		)
+		SELECT gr.id, gr.name, rr.ratio, gr.minutes, ic.num_ingredients AS ingredientsCount
+		FROM good_recipes gr
+		JOIN ingr_count ic ON gr.id = ic.recipe_id
+		JOIN rating_ratio rr ON gr.id = rr.id
 		ORDER BY ${sortBy}
 		LIMIT ${recipeCount};
 	`
 
 	if (sortBy === 'ratings') {
 		query = `	
-		SELECT r.name, r.ratings, r.minutes, ic.num_ingredients as ingredientsCount
-		FROM valid_recipes r
-		JOIN ingr_count ic ON r.id = ic.recipe_id
-		WHERE r.total_fat <= '${maxTotalFat}' AND
-					r.sugar <= '${maxSugar}' AND
-							r.sodium <= '${maxSodium}' AND
-							r.protein <= '${maxProtein}' AND
-							r.saturated_fat <= '${maxSaturatedFat}'
+		WITH good_recipes AS (
+			SELECT r.id, r.name, r.ratings, r.minutes
+			FROM valid_recipes r
+			WHERE r.total_fat <= '${maxTotalFat}' AND
+				r.sugar <= '${maxSugar}' AND
+					r.sodium <= '${maxSodium}' AND
+					r.protein <= '${maxProtein}' AND
+					r.saturated_fat <= '${maxSaturatedFat}'
+		), rating_ratio AS (
+			SELECT r.id, r.ratings / r.num_rating AS ratio
+			FROM valid_recipes r
+			ORDER BY ratio
+		)
+		SELECT gr.id, gr.name, rr.ratio, gr.minutes, ic.num_ingredients AS ingredientsCount
+		FROM good_recipes gr
+		JOIN ingr_count ic ON gr.id = ic.recipe_id
+		JOIN rating_ratio rr ON gr.id = rr.id
 		ORDER BY ${sortBy} DESC
 		LIMIT ${recipeCount};
 		`
@@ -325,38 +373,60 @@ const withoutIngredients = (req, res) => {
 		const ingredient0 = ingredients[0] ? ingredients[0] : ''
 		const ingredient1 = ingredients[1] ? ingredients[1] : ''
 		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		console.log(ingredient0)
 		query = `				
-			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
-			FROM valid_recipes r
-			JOIN ingr_count ic ON r.id = ic.recipe_id
-			WHERE id NOT IN 
-			(
-				SELECT DISTINCT r.id
+			WITH rating_ratio AS (
+				SELECT r.id, r.ratings / r.num_rating AS ratio
 				FROM valid_recipes r
-				JOIN has_ingr hi ON r.id = hi.ingr_id
-				JOIN ingr i ON hi.ingr_id = i.id
-				WHERE i.name LIKE '%${ingredient0}%'
-				OR i.name LIKE '%${ingredient1}%'
-				OR i.name LIKE '%${ingredient2}%'
+				ORDER BY ratio
 			)
-			ORDER BY ${sortBy}
+			SELECT r.name, rr.ratio, r.minutes, ic.num_ingredients 
+			FROM valid_recipes r
+			JOIN rating_ratio rr ON r.id = rr.id
+			JOIN ingr_count ic ON rr.id = ic.recipe_id
+			WHERE r.id NOT IN (
+				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
+				FROM has_ingr hi
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '% ${ingredient0}%' 
+					OR i.name LIKE '% ${ingredient1}%' 
+					OR i.name LIKE '% ${ingredient2}%'
+					OR i.name LIKE '${ingredient0}%' 
+					OR i.name LIKE '${ingredient1}%'
+					OR i.name LIKE '${ingredient2}%' 
+				GROUP BY hi.recipe_id
+			)
+			ORDER BY ${sortBy} DESC
 			LIMIT ${recipeCount};
 		`
 
 		if (sortBy === 'ratings') {
 			query = `				
-			SELECT name, ratings, minutes, ic.num_ingredients as ingredientsCount
-			FROM valid_recipes r
-			JOIN ingr_count ic ON r.id = ic.recipe_id
-			WHERE id NOT IN 
-			(
+			WITH rating_ratio AS (
+				SELECT r.id, r.ratings / r.num_rating AS ratio
+				FROM valid_recipes r
+				ORDER BY ratio
+			), excluded_recipes AS (
 				SELECT DISTINCT r.id
 				FROM valid_recipes r
-				JOIN has_ingr hi ON r.id = hi.ingr_id
+				JOIN has_ingr hi ON r.id = hi.recipe_id
 				JOIN ingr i ON hi.ingr_id = i.id
 				WHERE i.name LIKE '%${ingredient0}%'
-				OR i.name LIKE '%${ingredient1}%'
-				OR i.name LIKE '%${ingredient2}%'
+					OR i.name LIKE '%${ingredient1}%'
+					OR i.name LIKE '%${ingredient2}%'
+			)
+			SELECT r.name, rr.ratio, r.minutes, ic.num_ingredients 
+			FROM valid_recipes r
+			JOIN rating_ratio rr ON r.id = rr.id
+			JOIN ingr_count ic ON rr.id = ic.recipe_id
+			WHERE NOT EXISTS (
+				SELECT DISTINCT r.id
+				FROM valid_recipes r
+				JOIN has_ingr hi ON r.id = hi.recipe_id
+				JOIN ingr i ON hi.ingr_id = i.id
+				WHERE i.name LIKE '%${ingredient0}%'
+					OR i.name LIKE '%${ingredient1}%'
+					OR i.name LIKE '%${ingredient2}%'	
 			)
 			ORDER BY ${sortBy} DESC
 			LIMIT ${recipeCount};
@@ -365,6 +435,7 @@ const withoutIngredients = (req, res) => {
 	}
 
 	connection.query(query, (err, rows, fields) => {
+		console.log(rows)
 		if (err) console.log(err);
 		else res.json(rows);
 	});
@@ -382,4 +453,5 @@ module.exports = {
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
 	withoutIngredients: withoutIngredients,
+
 };
