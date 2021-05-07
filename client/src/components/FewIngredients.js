@@ -45,13 +45,7 @@ const FewIngredients = () => {
 				<div className='button' onClick={_ => fetchResults()}>Find</div>
 			</div>
 			<div className='results-container'>
-				{recipes.map((recipe, idx) => <RecipeCard
-					key={`few-ingredients-${idx}`}
-					name={recipe.name}
-					ingredientCount={recipe.ingredientCount}
-					rating={recipe.ratings}
-					cookingTime={recipe.minutes}
-				/>)}
+				{recipes.map((recipe, idx) => <RecipeCard key={`recipe-${idx}`}recipe={recipe}/>)}
 			</div>
 		</div>
 	)

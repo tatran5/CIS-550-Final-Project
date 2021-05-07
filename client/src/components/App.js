@@ -9,6 +9,7 @@ import NavBar from './helpers/NavBar'
 import ForDish from './ForDish'
 import ForLazyCooking from './ForLazyCooking'
 import ForRestrictionsNeeds from './ForRestrictionsNeeds'
+import UniqueDishes from './UniqueDishes'
 
 export default class App extends React.Component {
 
@@ -38,6 +39,10 @@ export default class App extends React.Component {
 						<Route
 							path="/for-restrictions-and-needs"
 							render={() => <ForRestrictionsNeeds />}
+						/>
+						<Route
+							path="/for-unique-dishes"
+							render={() => <UniqueDishes />}
 						/>
 					</Switch>
 				</Router>

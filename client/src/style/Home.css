@@ -26,6 +26,17 @@
 	font-weight: bold;
 }
 
+.recipe {
+display: block;
+}
+
 .recipe:hover {
 	text-decoration: underline;
+}
+
+.Home a, .Home a:link, .Home a:active, .Home a:visited, .Home a:hover {
+	color: black;
+	display: block;
+	height: 100%;
+	width: fit-content;
 }

@@ -65,14 +65,7 @@ const NutritionalNeeds = () => {
 			<div className='results-container'>
 				{recipes.map((recipe, i) =>
 					<div key={`recipe-${i}`}>
-						<RecipeCard
-							name={recipe.name}
-							cookingTime={recipe.minutes}
-							ingredientCount={recipe.ingredientsCount}
-							stepCount={recipe.stepCount}
-							rating={recipe.ratings}
-							ratingCount={recipe.ratingCount}
-						/>
+						<RecipeCard recipe={recipe}/>
 						<br />
 					</div>
 				)}

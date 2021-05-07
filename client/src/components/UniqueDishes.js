@@ -1,34 +1,32 @@
 import React, { useState } from 'react'
 import InputDropdown from './helpers/InputDropdown'
-import InputText from './helpers/InputText'
 import RecipeCard from './helpers/RecipeCard'
 import { 
-	sortBy as sortByConsts, 
+	sortByWithIngredients as sortByConsts, 
 	recipeCount as recipeCountConsts, 
-	restrictions as restrictionConsts,
-	matchCategoryWithDb 
+	matchCategoryWithDb
 } from './helpers/Consts'
-import '../style/ForDish.css'
-import '../style/RestrictionsAndNeeds.css'
+import '../style/ForLeftover.css'
 
-const RestrictionsNeeds = () => {
-	const [restriction, setRestriction] = useState(restrictionConsts.options[0])
+const UniqueDishes = () => {
+
 	const [recipeCount, setRecipeCount] = useState(recipeCountConsts.options[0])
 	const [sortBy, setSortBy] = useState(sortByConsts.options[0])
 	const [recipes, setRecipes] = useState([])
 
 	const fetchResults = () => {
 		const params = new URLSearchParams()
-		params.append('restriction', matchCategoryWithDb(restriction))
 		params.append('recipeCount', recipeCount)
 		params.append('sortBy', matchCategoryWithDb(sortBy))
+		console.log(sortBy)
 
-		fetch('/restriction?' + params)
+		fetch('/unique?' + params)
 			.then(res => {
 				const json = res.json()
 				return json
 			})
 			.then(data => {
+				console.log(data)
 				setRecipes(data)
 			})
 			.catch(e => {
@@ -36,11 +34,11 @@ const RestrictionsNeeds = () => {
 				return alert('Something went wrong while fetching result')
 			})
 	}
+
 	return (
-		<div className='ExcludeIngredients'>
+		<div className='ForLeftover'>
+			<div className='title'>Unique Dishes</div>
 			<div className='inputs'>
-				<InputDropdown name='restriction' title='Restriction (nut or meat)'
-					onSelectionChange={setRestriction} options={restrictionConsts.options} />
 				<InputDropdown name='recipe-count' title={recipeCountConsts.title}
 					onSelectionChange={setRecipeCount} options={recipeCountConsts.options} />
 				<InputDropdown name='sort-by' title={sortByConsts.title}
@@ -49,11 +47,13 @@ const RestrictionsNeeds = () => {
 			</div>
 			<div className='results-container'>
 				{recipes.map((recipe, i) =>
-					<div key={`recipe-${i}`}> <RecipeCard recipe={recipe}/></div>
+					<div key={`recipe-${i}`}>
+						<RecipeCard recipe={recipe}/>
+					</div>
 				)}
 			</div>
 		</div>
 	)
 }
 
-export default RestrictionsNeeds;
+export default UniqueDishes;

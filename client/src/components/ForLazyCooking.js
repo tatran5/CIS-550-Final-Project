@@ -42,7 +42,6 @@ const ForLazyCooking = () => {
 			<div className='options'>
 				<div className='for leftover' onClick={e => setOption(options.LEFOVER)}>Use leftover ingredients</div>
 				<div className='for time-pdf' onClick={e => setOption(options.TIME_PDV)}>10 recipes for lowest cooking time & PDV</div>
-				<div className='for time-steps' onClick={e => setOption(options.TIME_STEPS)}>Lowest cooking time & least steps</div>
 				<div className='for common-ingredients' onClick={e => setOption(options.COMMON_INGREDIENTS)}>10 most common ingredients</div>
 				<div className='for few-ingredients' onClick={e => setOption(options.FEW_INGREDIENTS)}>Use at most 5 ingredients</div>
 			</div>
