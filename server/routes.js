@@ -226,6 +226,66 @@ const withFewIngredients = (req, res) => {
 	});
 }
 
+const unique = (req, res) => {
+	const { recipeCount, sortBy} = req.query
+
+	let query = `
+		WITH above_ave_recipes AS 
+		(
+			SELECT id, num_rating
+			FROM valid_recipes 
+			WHERE num_rating > 
+		(
+			SELECT SQL_NO_CACHE AVG(num_rating)
+		FROM valid_recipes 
+		WHERE num_rating > 25
+		)
+		),
+		unique_ingredients AS
+		(
+		SELECT r.id, COUNT(*) AS num_uniq_ingr
+			FROM valid_recipes r
+		JOIN has_ingr hi ON r.id = hi.recipe_id
+		JOIN ingr i ON hi.ingr_id = i.id
+			WHERE i.id IN
+				(
+				SELECT  i.id
+		FROM valid_recipes r
+		JOIN has_ingr hi ON r.id = hi.recipe_id
+		JOIN ingr i ON hi.ingr_id = i.id
+		GROUP BY i.id
+		HAVING COUNT(*) = 1
+				)
+			GROUP BY r.id
+		),
+		rating_ratio AS 
+		(
+			SELECT r.id, r.ratings / r.num_rating AS ratio
+		FROM valid_recipes r
+		ORDER BY ratio
+		)
+		SELECT r.id, r.name, r.ratings, r.minutes, avr.num_rating, rr.ratio, ui.num_uniq_ingr AS uniqueIngredientsCount, ic.num_ingredients AS ingredientsCount, (ui.num_uniq_ingr / ic.num_ingredients) AS ratio
+		FROM (SELECT vr.id, vr.name, vr.ratings, vr.minutes FROM valid_recipes vr) AS r
+		JOIN above_ave_recipes avr ON r.id = avr.id
+		JOIN unique_ingredients ui ON ui.id = r.id
+		INNER JOIN (SELECT recipe_id, num_ingredients FROM ingr_count) AS ic ON ic.recipe_id = r.id
+		JOIN rating_ratio rr ON rr.id = r.id
+		ORDER BY ${sortBy}`
+
+		if (sortBy === 'ratings') {
+			query += ` DESC
+			`
+		}
+
+		query += `\nLIMIT ${recipeCount}`
+
+		connection.query(query, (err, rows, fields) => {
+			if (err) console.log(err);
+			else res.json(rows);
+		});
+}
+
+
 const withIngredients = (req, res) => {
 	const { ingredients, recipeCount, sortBy } = req.query
 	console.log(ingredients) // array of strings
@@ -450,9 +510,9 @@ module.exports = {
 	lowestTimeSteps: lowestTimeSteps,
 	randomRecipe: randomRecipe,
 	restriction: restriction,
+	unique: unique,
 	withFewIngredients: withFewIngredients,
 	withIngredients: withIngredients,
 	withNutritions: withNutritions,
 	withoutIngredients: withoutIngredients,
-
 };
