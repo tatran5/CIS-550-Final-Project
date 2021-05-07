@@ -243,35 +243,35 @@ const withIngredients = (req, res) => {
 			SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
 			FROM has_ingr hi
 			JOIN ingr i ON hi.ingr_id = i.id
-			WHERE i.name LIKE '${ingredient0}' 
-				OR i.name LIKE '${ingredient1}'
-				OR i.name LIKE '${ingredient2}' 
-			GROUP BY hi.recipe_id
-		), rating_ratio AS (
-			SELECT r.id, r.ratings / r.num_rating AS ratio
-		FROM valid_recipes r
-		ORDER BY ratio
-		)
-		SELECT r.id, r.name, rwi.num_ingr AS includedIngredientsCount, ic.num_ingredients AS ingredientsCount, r.ratings, r.minutes
-		FROM valid_recipes r
-		JOIN ingr_count ic ON r.id = ic.recipe_id
-		JOIN rec_with_ingr rwi ON r.id = rwi.id
-		JOIN rating_ratio rr ON r.id = rr.id
-		ORDER BY ${sortBy}
-		LIMIT ${recipeCount};
-		`
+			WHERE `
+		
+		let addedFirstIngr = false
+		if (ingredient0) {
+			query += `
+			i.name LIKE '% ${ingredient0}%'
+			OR i.name LIKE '${ingredient0}%' 
+			`
+			addedFirstIngr = true;
+		}
 
-		if (sortBy === 'ratings' || sortBy === 'includedIngredientsCount') {
-			query = `				
-			WITH rec_with_ingr AS 
-			(
-				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
-				FROM has_ingr hi
-				JOIN ingr i ON hi.ingr_id = i.id
-				WHERE i.name LIKE '${ingredient0}' 
-					OR i.name LIKE '${ingredient1}'
-					OR i.name LIKE '${ingredient2}' 
-				GROUP BY hi.recipe_id
+		if (ingredient1) {
+			query += `
+			${addedFirstIngr? 'OR' : ''} i.name LIKE '% ${ingredient1}%'
+			OR i.name LIKE '${ingredient1}%' 
+			`
+			addedFirstIngr = true;
+		}
+
+		if (ingredient2) {
+			query += `
+			${addedFirstIngr? 'OR' : ''} i.name LIKE '% ${ingredient2}%'
+			OR i.name LIKE '${ingredient2}%' 
+			`
+			addedFirstIngr = true;
+		}
+
+		query += `
+			GROUP BY hi.recipe_id
 			), rating_ratio AS (
 				SELECT r.id, r.ratings / r.num_rating AS ratio
 			FROM valid_recipes r
@@ -282,7 +282,16 @@ const withIngredients = (req, res) => {
 			JOIN ingr_count ic ON r.id = ic.recipe_id
 			JOIN rec_with_ingr rwi ON r.id = rwi.id
 			JOIN rating_ratio rr ON r.id = rr.id
+			`
+
+		if (sortBy === 'ratings' || sortBy === 'includedIngredientsCount') {
+			query += `				
 			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		} else {
+			query += `				
+			ORDER BY ${sortBy}
 			LIMIT ${recipeCount};
 			`
 		}
