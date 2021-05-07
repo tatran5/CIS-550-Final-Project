@@ -26,6 +26,11 @@ const commonIngredients = (req, res) => {
 	FROM valid_recipes r
 	JOIN has_ingr hi ON r.id = hi.recipe_id
 	JOIN ingr i ON hi.ingr_id = i.id 
+	WHERE i.name <> "flmy"
+	AND i.name <> "salt"
+	AND i.name <> "pepper"
+	AND i.name <> "water"
+	AND i.name <> "%garlic%"
 	GROUP BY i.id 
 	ORDER BY count DESC
 	LIMIT 10;
@@ -102,23 +107,6 @@ const lowestTimePDV = (req, res) => {
 		if (err) console.log(err);
 		else res.json(rows);
 	});
-}
-
-const lowestTimeSteps = (req, res) => {
-	// TODO: write query and return 
-	// Follow the examples in hw2 to return 
-	// connection.query(query, (err, rows, fields) => {
-	//   if (err) console.log(err);
-	//   else res.json(results);
-	// });
-
-	// TODO: DELETE THIS ONCE DONE IMPLEMENTING QUERIES 
-	// THIS IS PLACEHOLDER TO CHECK FETCH CALLS HERE
-	const results = [
-		{ name: 'ramen', times: '10', ingredientCount: 2, stepCount: 5, rating: 5, ratingCount: 20, time: 10 },
-		{ name: 'fries', times: '20', ingredientCount: 1, stepCount: 4, rating: 2, ratingCount: 10, time: 20 }
-	]
-	res.json(results)
 }
 
 const randomRecipe = (req, res) => {
@@ -278,15 +266,7 @@ const unique = (req, res) => {
 		JOIN above_ave_recipes avr ON r.id = avr.id
 		JOIN unique_ingredients ui ON ui.id = r.id
 		INNER JOIN (SELECT recipe_id, num_ingredients FROM ingr_count) AS ic ON ic.recipe_id = r.id
-		JOIN rating_ratio rr ON rr.id = r.id
-		ORDER BY ${sortBy}`
-
-		if (sortBy === 'ratings') {
-			query += ` DESC
-			`
-		}
-
-		query += `\nLIMIT ${recipeCount}`
+		JOIN rating_ratio rr ON rr.id = r.id`
 
 		connection.query(query, (err, rows, fields) => {
 			if (err) console.log(err);
@@ -364,12 +344,13 @@ const withIngredients = (req, res) => {
 			LIMIT ${recipeCount};
 			`
 		}
+		connection.query(query, (err, rows, fields) => {
+			if (err) console.log(err);
+			else res.json(rows);
+		});
+	} else {
+		res.json([])
 	}
-
-	connection.query(query, (err, rows, fields) => {
-		if (err) console.log(err);
-		else res.json(rows);
-	});
 }
 
 const withNutritions = (req, res) => {
@@ -401,33 +382,21 @@ const withNutritions = (req, res) => {
 		FROM good_recipes gr
 		JOIN ingr_count ic ON gr.id = ic.recipe_id
 		JOIN rating_ratio rr ON gr.id = rr.id
-		ORDER BY ${sortBy}
-		LIMIT ${recipeCount};
 	`
 
 	if (sortBy === 'ratings') {
-		query = `	
-		WITH good_recipes AS (
-			SELECT r.id, r.name, r.ratings, r.minutes
-			FROM valid_recipes r
-			WHERE r.total_fat <= '${maxTotalFat}' AND
-				r.sugar <= '${maxSugar}' AND
-					r.sodium <= '${maxSodium}' AND
-					r.protein <= '${maxProtein}' AND
-					r.saturated_fat <= '${maxSaturatedFat}'
-		), rating_ratio AS (
-			SELECT r.id, r.ratings / r.num_rating AS ratio
-			FROM valid_recipes r
-			ORDER BY ratio
-		)
-		SELECT gr.id, gr.name, rr.ratio, gr.minutes, ic.num_ingredients AS ingredientsCount
-		FROM good_recipes gr
-		JOIN ingr_count ic ON gr.id = ic.recipe_id
-		JOIN rating_ratio rr ON gr.id = rr.id
+		query += `	
 		ORDER BY ${sortBy} DESC
-		LIMIT ${recipeCount};
+		`
+	} else {
+		query += `
+		ORDER BY ${sortBy}
 		`
 	}
+
+	query += `	
+	LIMIT ${recipeCount};
+	`
 
 	connection.query(query, (err, rows, fields) => {
 		if (err) console.log(err);
@@ -502,13 +471,15 @@ const withoutIngredients = (req, res) => {
 			LIMIT ${recipeCount};
 			`
 		}
-	}
 
-	connection.query(query, (err, rows, fields) => {
-		console.log(query)
-		if (err) console.log(err);
-		else res.json(rows);
-	});
+		connection.query(query, (err, rows, fields) => {
+			console.log(query)
+			if (err) console.log(err);
+			else res.json(rows);
+		});
+	} else {
+		res.json([])
+	}
 }
 
 module.exports = {
@@ -516,7 +487,6 @@ module.exports = {
 	getRecipes: getRecipes,
 	getTopRecipes: getTopRecipes,
 	lowestTimePDV: lowestTimePDV,
-	lowestTimeSteps: lowestTimeSteps,
 	randomRecipe: randomRecipe,
 	restriction: restriction,
 	unique: unique,

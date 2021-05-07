@@ -18,7 +18,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 // FINAL PROJECT - ROUTES SORTED ALPHABETICALLY
 app.get('/common-ingredients', routes.commonIngredients)
 app.get('/lowest-time-pdv', routes.lowestTimePDV)
-app.get('/lowest-time-steps', routes.lowestTimeSteps)
 app.get('/nutritions', routes.withNutritions)
 app.get('/unique', routes.unique)
 app.get('/random-recipe', routes.randomRecipe)
