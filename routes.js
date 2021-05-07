@@ -1,8 +1,7 @@
 // const config = require('./db-config.js');
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '/config/.env') });
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const mysql = require('mysql');
-const e = require('cors');
 
 const config = {
 	host: process.env.DB_HOST,
@@ -12,6 +11,7 @@ const config = {
 	database: process.env.DB_NAME,
 	connectionLimit: 10
 }
+console.log(config)
 const connection = mysql.createPool(config);
 
 /* -------------------------------------------------- */
