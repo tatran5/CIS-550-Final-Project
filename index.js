@@ -40,6 +40,6 @@ app.get('*', (req, res) => {
 
 app.use(express.static(path.join(__dirname, './client/build')));
 
-app.listen(process.env.PORT || 8081), () => {
+app.listen(process.env.PORT || 8081, () => {
 	console.log(`Server listening on PORT 8081`);
 });
