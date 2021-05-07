@@ -31,7 +31,7 @@ app.get('/with-name', routes.getRecipes)
 
 // INTEGRATION
 app.get('/favicon.ico', (req, res) => {
-  res.status(404).send()
+  res.sendFile(path.join(__dirname, './client/build/favicon.ico'));
 })
 // Every request to the back end will be send to react app
 app.get('*', (req, res) => {
