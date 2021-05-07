@@ -1,0 +1,42 @@
+.Home {
+	width: 100%;
+	height: fit-content;
+}
+
+.Home > .title {
+	height: 65vh;
+	font-size: min(80px, 25vh);
+} 
+
+.recipes {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.column-header {
+	font-weight: bold;
+}
+
+.recipe {
+display: block;
+}
+
+.recipe:hover {
+	text-decoration: underline;
+}
+
+.Home a, .Home a:link, .Home a:active, .Home a:visited, .Home a:hover {
+	color: black;
+	display: block;
+	height: 100%;
+	width: fit-content;
+}

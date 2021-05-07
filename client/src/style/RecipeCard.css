@@ -1,0 +1,35 @@
+.RecipeCard {
+	width: 200px;
+	height: 175px;
+	min-height: fit-content;
+	margin: 15px 15px 15px 15px;
+	background-color: white;
+	padding: 15px;
+	border-radius: 12px;
+}
+
+.RecipeCard > * {
+	text-align: center;
+	width: 100%;
+}
+
+.RecipeCard > .cooking-time{
+	text-align: center;
+	width: 100%;
+}
+
+.RecipeCard > .name {
+	color: black;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.name > a, .name > a:link, .name > a:active {
+	color: black;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.name > a:hover {
+	text-decoration: underline;
+}
