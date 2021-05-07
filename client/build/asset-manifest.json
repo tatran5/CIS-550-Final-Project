@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/static/css/main.3b62265f.chunk.css",
-    "main.js": "/static/js/main.70233024.chunk.js",
-    "main.js.map": "/static/js/main.70233024.chunk.js.map",
+    "main.css": "/static/css/main.a0369b47.chunk.css",
+    "main.js": "/static/js/main.ee308872.chunk.js",
+    "main.js.map": "/static/js/main.ee308872.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.cea588d5.js",
     "runtime-main.js.map": "/static/js/runtime-main.cea588d5.js.map",
     "static/js/2.e39fc2ef.chunk.js": "/static/js/2.e39fc2ef.chunk.js",
     "static/js/2.e39fc2ef.chunk.js.map": "/static/js/2.e39fc2ef.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.b1c8904cdb50d900fd347566c545ca1d.js": "/precache-manifest.b1c8904cdb50d900fd347566c545ca1d.js",
+    "precache-manifest.8f6902c2803bb46bed442bee0febe827.js": "/precache-manifest.8f6902c2803bb46bed442bee0febe827.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.3b62265f.chunk.css.map": "/static/css/main.3b62265f.chunk.css.map",
+    "static/css/main.a0369b47.chunk.css.map": "/static/css/main.a0369b47.chunk.css.map",
     "static/js/2.e39fc2ef.chunk.js.LICENSE": "/static/js/2.e39fc2ef.chunk.js.LICENSE",
     "static/media/index.css": "/static/media/Scada-Regular.a2947b92.ttf"
   },
   "entrypoints": [
     "static/js/runtime-main.cea588d5.js",
     "static/js/2.e39fc2ef.chunk.js",
-    "static/css/main.3b62265f.chunk.css",
-    "static/js/main.70233024.chunk.js"
+    "static/css/main.a0369b47.chunk.css",
+    "static/js/main.ee308872.chunk.js"
   ]
 }

@@ -29,16 +29,12 @@ app.get('/with-few-ingredients', routes.withFewIngredients)
 app.get('/with-ingredients', routes.withIngredients)
 app.get('/with-name', routes.getRecipes)
 
-// INTEGRATION
-app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, './client/build/favicon.ico'));
-})
-// Every request to the back end will be send to react app
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './client/build/index.html'));
-});
 
-app.use(express.static(path.join(__dirname, './client/build')));
+const root = require('path').join(__dirname, 'client', 'build')
+app.use(express.static(root));
+app.get("*", (req, res) => {
+    res.sendFile('index.html', { root });
+})
 
 app.listen(process.env.PORT || 8081, () => {
 	console.log(`Server listening on PORT 8081`);
