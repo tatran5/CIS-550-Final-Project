@@ -29,15 +29,16 @@ app.get('/with-few-ingredients', routes.withFewIngredients)
 app.get('/with-ingredients', routes.withIngredients)
 app.get('/with-name', routes.getRecipes)
 
-app.use(express.static(path.join(__dirname, './client/build')));
-
 // INTEGRATION
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, './build/favicon.ico'))
+  res.sendFile(path.join(__dirname, './client/build/favicon.ico'))
 })
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './build/index.html'))
+  res.sendFile(path.join(__dirname, './client/build/index.html'))
 })
+
+
+app.use(express.static(path.join(__dirname, './client/build')));
 
 // Every request to the back end will be send to react app
 app.get('*', (req, res) => {
