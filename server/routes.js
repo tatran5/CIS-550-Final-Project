@@ -1,5 +1,6 @@
 const config = require('./db-config.js');
 const mysql = require('mysql');
+const e = require('cors');
 
 config.connectionLimit = 10;
 const connection = mysql.createPool(config);
@@ -233,21 +234,18 @@ const withIngredients = (req, res) => {
 
 	let query = ''			
 	if (ingredients) {
-		const ingredient0 = ingredients[0] ? ingredients[0] : ''
-		const ingredient1 = ingredients[1] ? ingredients[1] : ''
-		const ingredient2 = ingredients[2] ? ingredients[2] : ''
+		const ingredient0 = `%${ingredients[0]}%` ? ingredients[0] : ''
+		const ingredient1 = `%${ingredients[1]}%` ? ingredients[1] : ''
+		const ingredient2 = `%${ingredients[2]}%` ? ingredients[2] : ''
 		query = `				
 		WITH rec_with_ingr AS 
 		(
 			SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
 			FROM has_ingr hi
 			JOIN ingr i ON hi.ingr_id = i.id
-			WHERE i.name LIKE '% ${ingredient0}%' 
-				OR i.name LIKE '% ${ingredient1}%' 
-				OR i.name LIKE '% ${ingredient2}%'
-				OR i.name LIKE '${ingredient0}%' 
-				OR i.name LIKE '${ingredient1}%'
-				OR i.name LIKE '${ingredient2}%' 
+			WHERE i.name LIKE '${ingredient0}' 
+				OR i.name LIKE '${ingredient1}'
+				OR i.name LIKE '${ingredient2}' 
 			GROUP BY hi.recipe_id
 		), rating_ratio AS (
 			SELECT r.id, r.ratings / r.num_rating AS ratio
@@ -270,12 +268,9 @@ const withIngredients = (req, res) => {
 				SELECT hi.recipe_id AS id, COUNT(*) AS num_ingr
 				FROM has_ingr hi
 				JOIN ingr i ON hi.ingr_id = i.id
-				WHERE i.name LIKE '% ${ingredient0}%' 
-					OR i.name LIKE '% ${ingredient1}%' 
-					OR i.name LIKE '% ${ingredient2}%'
-					OR i.name LIKE '${ingredient0}%' 
-					OR i.name LIKE '${ingredient1}%'
-					OR i.name LIKE '${ingredient2}%' 
+				WHERE i.name LIKE '${ingredient0}' 
+					OR i.name LIKE '${ingredient1}'
+					OR i.name LIKE '${ingredient2}' 
 				GROUP BY hi.recipe_id
 			), rating_ratio AS (
 				SELECT r.id, r.ratings / r.num_rating AS ratio
@@ -371,9 +366,9 @@ const withoutIngredients = (req, res) => {
 	let query = ''			
 	if (ingredients) {
 		// Have to do this to avoid situation where '' becomes '%%' inside the query, which may give no results back
-		const ingredient0 = `%${ingredients[0]}%` ? ingredients[0] : ''
-		const ingredient1 = `%${ingredients[1]}%` ? ingredients[1] : ''
-		const ingredient2 = `%${ingredients[2]}%` ? ingredients[2] : ''
+		const ingredient0 = `${ingredients[0]}` ? ingredients[0] : ''
+		const ingredient1 = `${ingredients[1]}` ? ingredients[1] : ''
+		const ingredient2 = `${ingredients[2]}` ? ingredients[2] : ''
 		console.log(ingredient0)
 		query = `				
 		WITH  rating_ratio AS (
@@ -391,42 +386,48 @@ const withoutIngredients = (req, res) => {
 				FROM valid_recipes r
 				JOIN has_ingr hi ON r.id = hi.recipe_id
 				JOIN ingr i ON hi.ingr_id = i.id
-				WHERE i.name LIKE '${ingredient0}'
-				OR i.name LIKE '${ingredient1}'
-				OR i.name LIKE '${ingredient2}'
-			) 
+				WHERE `
+		
+		let addedFirstIngr = false
+		if (ingredient0) {
+			query += `
+			i.name LIKE '% ${ingredient0}%'
+			OR i.name LIKE '${ingredient0}%' 
+			`
+			addedFirstIngr = true;
+		}
+
+		if (ingredient1) {
+			query += `
+			${addedFirstIngr? 'OR' : ''} i.name LIKE '% ${ingredient1}%'
+			OR i.name LIKE '${ingredient1}%' 
+			`
+			addedFirstIngr = true;
+		}
+
+		if (ingredient2) {
+			query += `
+			${addedFirstIngr? 'OR' : ''} i.name LIKE '% ${ingredient2}%'
+			OR i.name LIKE '${ingredient2}%' 
+			`
+			addedFirstIngr = true;
+		}
+
+		if (sortBy === 'ratings') {
+			query += `)				
+			ORDER BY ${sortBy} DESC
+			LIMIT ${recipeCount};
+			`
+		} else {
+			query += `)				
 			ORDER BY ${sortBy}
 			LIMIT ${recipeCount};
 			`
-
-		if (sortBy === 'ratings') {
-			query = `				
-			WITH  rating_ratio AS (
-				SELECT r.id, r.ratings / r.num_rating AS ratio
-				FROM valid_recipes r
-				ORDER BY ratio
-				)
-				SELECT r.id, r.ratings, r.name, rr.ratio, r.minutes, ic.num_ingredients AS ingredientsCount
-				FROM valid_recipes r
-				JOIN rating_ratio rr ON r.id = rr.id
-				JOIN ingr_count ic ON rr.id = ic.recipe_id
-				WHERE rr.id NOT IN 
-				(
-					SELECT DISTINCT r.id
-					FROM valid_recipes r
-					JOIN has_ingr hi ON r.id = hi.recipe_id
-					JOIN ingr i ON hi.ingr_id = i.id
-					WHERE i.name LIKE '${ingredient0}'
-					OR i.name LIKE '${ingredient1}'
-					OR i.name LIKE '${ingredient2}'
-				) 
-				ORDER BY ${sortBy} DESC
-				LIMIT ${recipeCount};
-				`
 		}
 	}
 
 	connection.query(query, (err, rows, fields) => {
+		console.log(query)
 		if (err) console.log(err);
 		else res.json(rows);
 	});
