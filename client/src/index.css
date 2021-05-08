@@ -128,3 +128,7 @@ a:active{
 	justify-content: center;
 }
 
+.description {
+	margin: 0 200px 15px 200px;
+	text-align: center;
+}

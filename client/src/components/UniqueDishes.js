@@ -37,8 +37,10 @@ const UniqueDishes = () => {
 	}, [])
 	
 	return (
-		<div className='ForLeftover'>
+		<div className='UniqueDishes'>
 			<div className='title'>Unique Dishes</div>
+			<div className='description'> Recipes that have an above average number of ratings with at least 1 and at most 3 ingredients that recipe has that are not present in any other recipe in the database. For average number of ratings, we exclude ratings with less than 25 ratings in order to remove outliers and find unique recipes that have been reviewed by more users.	
+			</div>
 			<div className='results-container'>
 				{recipes.map((recipe, i) =>
 					<div key={`recipe-${i}`}>
